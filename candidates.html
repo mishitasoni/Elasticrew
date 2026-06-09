@@ -5,6 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elasticrew - Candidate Management</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- RIGID COMPACT INVITE MODAL SIZING --- */
+        .email-modal-card {
+            max-width: 460px !important;
+            width: 90% !important;
+            max-height: 85vh !important;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 18px 20px !important;
+        }
+
+        .modal-scrollable-form {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 12px !important;
+        }
+
+        .form-group label {
+            margin-bottom: 4px !important;
+            font-size: 12px !important;
+        }
+
+        .form-control {
+            padding: 6px 10px !important;
+            font-size: 13px !important;
+            height: auto !important;
+        }
+
+        .textarea-body {
+            height: 100px !important;
+            resize: none;
+        }
+
+        .modal-actions {
+            margin-top: 14px !important;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+            flex-shrink: 0;
+        }
+
+        /* --- STATUS DROP-DOWN PILL STYLES --- */
+        .status-select-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .grid-status-dropdown {
+            padding: 4px 24px 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .grid-status-dropdown:focus {
+            outline: none;
+            border-color: #cbd5e1;
+        }
+        
+        /* Status Colors Mapping Matrix */
+        .status-active { background-color: #dcfce7; color: #15803d; }
+        .status-onhold { background-color: #fef9c3; color: #a16207; }
+        .status-rejected { background-color: #fee2e2; color: #b91c1c; }
+        .status-hired { background-color: #ccfbf1; color: #0f766e; }
+        .status-withdrawn { background-color: #e2e8f0; color: #475569; }
+
+        .timestamp-txt {
+            font-family: monospace;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
 
@@ -37,7 +117,7 @@
             <div class="filter-bar">
                 <div class="search-box">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="searchName" placeholder="Search by candidate name or ID...">
+                    <input type="text" id="searchName" placeholder="Search by candidate name...">
                 </div>
                 <div class="filter-group">
                     <select id="filterDept" class="filter-select">
@@ -56,72 +136,88 @@
                     </select>
                     <select id="filterStage" class="filter-select">
                         <option value="all">All Stages</option>
-                        <option value="Screening">Screening Pending</option>
-                        <option value="Screening">Screening Completed</option>
-                        <option value="Screening">MCQ Assessment Pending</option>
-                        <option value="Screening">MCQ Assessment Completed</option>
-                        <option value="Screening">Tech Interview Pending</option>
-                        <option value="Screening">Tech Interview Completed</option>
-                        <option value="Screening">Hr Interview Pending</option>
-                        <option value="Screening">Hr Interview Completed</option>
-                        <option value="Screening">Report Generated</option>
-                        
+                        <option value="Video Screening Pending">Video Screening Pending</option>
+                        <option value="Video Screening Completed">Video Screening Completed</option>
+                        <option value="MCQ Assessment Pending">MCQ Assessment Pending</option>
+                        <option value="MCQ Assessment Completed">MCQ Assessment Completed</option>
+                        <option value="Tech Interview Pending">Tech Interview Pending</option>
+                        <option value="Tech Interview Completed">Tech Interview Completed</option>
+                        <option value="Hr Interview Pending">Hr Interview Pending</option>
+                        <option value="Hr Interview Completed">Hr Interview Completed</option>
+                        <option value="Report Generation Pending">Report Generation Pending</option>
+                        <option value="Report Generated">Report Generated</option>
+                    </select>
+                    <select id="filterStatus" class="filter-select">
+                        <option value="all">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Hired">Hired</option>
+                        <option value="Withdrawn">Withdrawn</option>
                     </select>
                 </div>
             </div>
 
-        <!-- UPDATE THIS SECTION IN candidates.html -->
-<div class="sub-nav-container">
-    <!-- Active Tab points to itself -->
-    <a href="candidates.html" class="sub-nav-tab active text-decoration-none">
-        <svg class="tab-icon icon-blue" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-        <span>All Candidates</span>
-        <span class="count-pill" id="totalCountBubble">5</span>
-    </a>
-    
-    <!-- Routing Tab points directly to screening.html -->
-    <a href="screening.html" class="sub-nav-tab text-decoration-none">
-        <svg class="tab-icon icon-purple" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-        <span>Video Bot Screening</span>
-    </a>
-    
-    <!-- Future Pipeline Expansion Placeholders -->
-    <a href="#" class="sub-nav-tab text-decoration-none">
-        <svg class="tab-icon icon-blue-alt" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
-        <span>MCQ Assessment</span>
-    </a>
-    
-    <a href="tech-scheduler.html" class="sub-nav-tab text-decoration-none">
-        <svg class="tab-icon icon-green" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect></svg>
-        <span>Tech Scheduler</span>
-    </a>
-    
-    <a href="#" class="sub-nav-tab text-decoration-none">
-        <svg class="tab-icon icon-amber" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        <span>HR Interview</span>
-    </a>
-</div>
+            <div class="sub-nav-container">
+                <a href="candidates.html" class="sub-nav-tab active text-decoration-none">
+                    <svg class="tab-icon icon-blue" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <span>All Candidates</span>
+                    <span class="count-pill" id="totalCountBubble">1</span>
+                </a>
+                
+                <a href="screening.html" class="sub-nav-tab text-decoration-none">
+                    <svg class="tab-icon icon-purple" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                    <span>Video Bot Screening</span>
+                </a>
+                
+                <a href="#" class="sub-nav-tab text-decoration-none">
+                    <svg class="tab-icon icon-blue-alt" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+                    <span>MCQ Assessment</span>
+                </a>
+                
+                <a href="tech-scheduler.html" class="sub-nav-tab text-decoration-none">
+                    <svg class="tab-icon icon-green" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect></svg>
+                    <span>Tech Scheduler</span>
+                </a>
+                
+                <a href="#" class="sub-nav-tab text-decoration-none">
+                    <svg class="tab-icon icon-amber" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span>HR Interview</span>
+                </a>
+            </div>
 
             <!-- CANDIDATES TABLE -->
             <table class="candidate-table" id="candidatesTable">
                 <thead>
                     <tr>
-                        <th>Candidate ID</th>
+                        <th>Date Added</th>
                         <th>Candidate Name</th>
                         <th>Sub Dept</th>
-                        <th>Stage</th>
+                        <th>Pipeline Stage</th>
                         <th>ElastiCrew Resume</th>
+                        <th>Admin Status</th>
                         <th style="text-align: right; padding-right: 24px;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="candidateListBody">
-                    <tr class="candidate-row" data-id="EC-2026-001" data-name="Achyut Pancholi" data-dept="Engineering" data-subdept="Full Stack" data-stage="Video Bot Screening Completed">
-                        <td><span class="id-badge">EC-2026-001</span></td>
+                    <tr class="candidate-row" data-name="Achyut Pancholi" data-dept="Engineering" data-subdept="Full Stack" data-stage="Video Screening Completed" data-status="Active">
+                        <td><span class="timestamp-txt">2026-06-08</span></td>
                         <td><strong>Achyut Pancholi</strong></td>
                         <td>Full Stack</td>
-                        <td><span class="stage-tag shortlisted">Screening Completed</span></td>
+                        <td><span class="stage-tag shortlisted">Video Screening Completed</span></td>
                         <td><span class="resume-tag">📄 Achyut_resume.pdf</span></td>
-                        <td style="text-align: right;">
+                        <td>
+                            <div class="status-select-wrapper">
+                                <select class="grid-status-dropdown status-active" onchange="updateRowStatusStyle(this)">
+                                    <option value="Active" selected>Active</option>
+                                    <option value="On Hold">On Hold</option>
+                                    <option value="Rejected">Rejected</option>
+                                    <option value="Hired">Hired</option>
+                                    <option value="Withdrawn">Withdrawn</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td style="text-align: right; padding-right: 24px;">
                             <select class="action-dropdown" onchange="handleAction(this)">
                                 <option value="" disabled selected>Manage</option>
                                 <option value="video">Send Video Bot Invite</option>
@@ -138,7 +234,7 @@
         </section>
     </main>
 
-    <!-- MODAL 1: FIXED ADD CANDIDATE MODAL -->
+    <!-- MODAL 1: ADD CANDIDATE MODAL -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-card">
             <h2 class="modal-header">Add New Candidate</h2>
@@ -164,17 +260,6 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="experience">Experience</label>
-                    <select id="experience" class="form-control" required>
-                        <option value="" disabled selected>Select Experience Level</option>
-                        <option value="Fresher (0 Years)">Fresher (0 Years)</option>
-                        <option value="Junior (1-3 Years)">Junior (1-3 Years)</option>
-                        <option value="Mid-Level (3-5 Years)">Mid-Level (3-5 Years)</option>
-                        <option value="Senior (5+ Years)">Senior (5+ Years)</option>
-                        <option value="Lead (10+ Years)">Lead (10+ Years)</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label for="resume">Upload Resume</label>
                     <input type="file" id="resume" class="form-control" accept=".pdf,.doc,.docx" required>
                 </div>
@@ -186,36 +271,47 @@
         </div>
     </div>
 
-    <!-- MODAL 2: EMAIL INVITATION MODAL -->
+    <!-- MODAL 2: COMPACT EMAIL INVITATION MODAL -->
     <div class="modal-overlay" id="emailModalOverlay">
         <div class="modal-card email-modal-card">
-            <h2 class="modal-header">Video Bot AI Interview Invitation</h2>
-            <form id="emailInviteForm">
+            <h2 class="modal-header" style="margin:0; padding-bottom:8px; border-bottom:1px solid #f1f5f9; font-size:16px;">Video Bot Invitation</h2>
+            
+            <form id="emailInviteForm" class="modal-scrollable-form">
                 <div class="form-group">
                     <label for="senderEmail">Sender</label>
                     <input type="email" id="senderEmail" class="form-control" value="hr@elasticrew.com" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="candidateEmail">Candidate Email (Parsed from Resume)</label>
+                    <label for="candidateEmail">Candidate Email</label>
                     <input type="email" id="candidateEmail" class="form-control" readonly>
                 </div>
+
+                <!-- INTEGRATION ENGINE: DROPDOWN PICKER -->
+                <div class="form-group">
+                    <label for="inviteQuestionSetSelect">Select Question Set</label>
+                    <select id="inviteQuestionSetSelect" class="form-control" required onchange="updateInviteQuestionSetTicker()">
+                        <!-- Dynamic options injected here -->
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label for="emailSubject">Subject</label>
                     <input type="text" id="emailSubject" class="form-control" value="Action Required: Complete your Video AI Screening with ElastiCrew" required>
                 </div>
                 <div class="form-group">
                     <label for="emailBody">Email Message Body</label>
-                    <textarea id="emailBody" class="form-control textarea-body" rows="8" required></textarea>
+                    <textarea id="emailBody" class="form-control textarea-body" required></textarea>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" id="closeEmailModalBtn">Cancel</button>
-                    <button type="submit" class="btn-submit dispatch-btn">Send Invite</button>
+                
+                <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button type="button" class="btn-secondary" id="closeEmailModalBtn" style="padding:6px 12px; font-size:12px;">Cancel</button>
+                    <button type="submit" class="btn-submit dispatch-btn" style="padding:6px 12px; font-size:12px;">Send Invite</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- REFACTORED DESKTOP APPS ENGINE Runtime Logic -->
+    <!-- Runtime Synchronization Engine -->
     <script>
         const openModalBtn = document.getElementById('openModalBtn');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -230,15 +326,62 @@
         const emailInviteForm = document.getElementById('emailInviteForm');
         const candidateEmailInput = document.getElementById('candidateEmail');
         const emailBodyTextArea = document.getElementById('emailBody');
+        const inviteQuestionSetSelect = document.getElementById('inviteQuestionSetSelect');
 
         const searchName = document.getElementById('searchName');
         const filterDept = document.getElementById('filterDept');
         const filterSubDept = document.getElementById('filterSubDept');
         const filterStage = document.getElementById('filterStage');
+        const filterStatus = document.getElementById('filterStatus');
 
-        let currentIdCounter = 2;
-        let activeRowForEmail = null;
-        let activeSubViewTab = 'all';
+        const baselineFallbackDatabase = {
+            "Operations|HR|Fresher(0)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Operations|HR|Junior(1-3)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Operations|HR|Mid Level(3-5)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Operations|HR|Senior(5+)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Operations|HR|Lead(10+)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5", "Question 6", "Question 7", "Question 8"],
+            "Engineering|Full Stack|Fresher(0)": ["Question 1", "Question 2", "Question 3"],
+            "Engineering|Full Stack|Junior(1-3)": ["Question 1", "Question 2", "Question 3"],
+            "Engineering|Full Stack|Mid Level(3-5)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Engineering|Full Stack|Senior(5+)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Engineering|Full Stack|Lead(10+)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5", "Question 6", "Question 7", "Question 8"]
+        };
+
+        function updateRowStatusStyle(selectEl) {
+            selectEl.classList.remove('status-active', 'status-onhold', 'status-rejected', 'status-hired', 'status-withdrawn');
+            const val = selectEl.value;
+            if (val === 'Active') selectEl.classList.add('status-active');
+            else if (val === 'On Hold') selectEl.classList.add('status-onhold');
+            else if (val === 'Rejected') selectEl.classList.add('status-rejected');
+            else if (val === 'Hired') selectEl.classList.add('status-hired');
+            else if (val === 'Withdrawn') selectEl.classList.add('status-withdrawn');
+            
+            const row = selectEl.closest('.candidate-row');
+            if (row) row.setAttribute('data-status', val);
+        }
+
+        function populateDynamicQuestionDropdown() {
+            let currentPools = localStorage.getItem('elasticrew_question_matrix');
+            if(!currentPools) {
+                localStorage.setItem('elasticrew_question_matrix', JSON.stringify(baselineFallbackDatabase));
+                currentPools = JSON.stringify(baselineFallbackDatabase);
+            }
+            
+            const database = JSON.parse(currentPools);
+            inviteQuestionSetSelect.innerHTML = '<option value="" disabled selected>Select configuration pool...</option>';
+            
+            Object.keys(database).forEach(key => {
+                const [dept, subdept, exp] = key.split('|');
+                const count = database[key].length;
+                
+                const optionNode = document.createElement('option');
+                optionNode.value = key;
+                optionNode.setAttribute('data-count', count);
+                optionNode.textContent = `${dept} - ${subdept} (${exp})`;
+                
+                inviteQuestionSetSelect.appendChild(optionNode);
+            });
+        }
 
         function toggleModal(show) {
             if (show) modalOverlay.classList.add('active');
@@ -246,8 +389,14 @@
         }
         
         function toggleEmailModal(show) {
-            if (show) emailModalOverlay.classList.add('active');
-            else { emailModalOverlay.classList.remove('active'); emailInviteForm.reset(); activeRowForEmail = null; }
+            if (show) {
+                populateDynamicQuestionDropdown();
+                emailModalOverlay.classList.add('active');
+            } else { 
+                emailModalOverlay.classList.remove('active'); 
+                emailInviteForm.reset(); 
+                activeRowForEmail = null; 
+            }
         }
 
         openModalBtn.addEventListener('click', () => toggleModal(true));
@@ -269,28 +418,26 @@
             const deptValue = filterDept.value;
             const subDeptValue = filterSubDept.value;
             const stageValue = filterStage.value;
+            const statusValue = filterStatus.value;
             const rows = candidateListBody.getElementsByClassName('candidate-row');
             
             let visibleCount = 0;
             totalCountBubble.innerText = rows.length;
 
             for (let row of rows) {
-                const id = row.getAttribute('data-id').toLowerCase();
                 const name = row.getAttribute('data-name').toLowerCase();
                 const dept = row.getAttribute('data-dept');
                 const subdept = row.getAttribute('data-subdept');
-                const stage = row.getAttribute('data-stage').toLowerCase();
+                const stage = row.getAttribute('data-stage');
+                const status = row.getAttribute('data-status');
 
-                const matchesSearch = name.includes(query) || id.includes(query);
+                const matchesSearch = name.includes(query);
                 const matchesDept = (deptValue === 'all' || dept === deptValue);
                 const matchesSubDept = (subDeptValue === 'all' || subdept === subDeptValue);
-                const matchesStage = (stageValue === 'all' || row.getAttribute('data-stage') === stageValue);
-                
-                let matchesSubTab = true;
-                if (activeSubViewTab === 'video') matchesSubTab = stage.includes('screening') || stage.includes('interviewing');
-                // Extension hooks for other custom workflow tabs can map here seamlessly
+                const matchesStage = (stageValue === 'all' || stage === stageValue);
+                const matchesStatus = (statusValue === 'all' || status === statusValue);
 
-                if (matchesSearch && matchesDept && matchesSubDept && matchesStage && matchesSubTab) { 
+                if (matchesSearch && matchesDept && matchesSubDept && matchesStage && matchesStatus) { 
                     row.style.display = ''; 
                     visibleCount++; 
                 } else { 
@@ -300,23 +447,27 @@
             noResults.style.display = visibleCount === 0 ? 'block' : 'none';
         }
 
-        function switchSubTab(clickedButton) {
-            document.querySelectorAll('.sub-nav-tab').forEach(btn => btn.classList.remove('active'));
-            clickedButton.classList.add('active');
-            activeSubViewTab = clickedButton.getAttribute('data-tab');
-            filterCandidates();
-        }
-
         searchName.addEventListener('input', filterCandidates);
         filterDept.addEventListener('change', filterCandidates);
         filterSubDept.addEventListener('change', filterCandidates);
         filterStage.addEventListener('change', filterCandidates);
+        filterStatus.addEventListener('change', filterCandidates);
+
+        function updateInviteQuestionSetTicker() {
+            const selectedOpt = inviteQuestionSetSelect.options[inviteQuestionSetSelect.selectedIndex];
+            if(selectedOpt && selectedOpt.value !== "") {
+                const count = selectedOpt.getAttribute('data-count');
+                const candName = activeRowForEmail ? activeRowForEmail.getAttribute('data-name') : "Candidate";
+                emailBodyTextArea.value = `Hi ${candName},\n\nPlease complete your Video AI Screening assessment configured for the ${selectedOpt.text}.\n\nThis workflow features exactly ${count} targeted question blocks. Complete it using the secure link inside your tracking workspace.\n\nBest regards,\nElastiCrew Management`;
+            }
+        }
 
         function handleAction(dropdown) {
             const selectedAction = dropdown.value;
             const row = dropdown.closest('.candidate-row');
             if (!row) return;
             const candidateName = row.getAttribute('data-name');
+            const candidateSubDept = row.getAttribute('data-subdept');
 
             if (selectedAction === 'delete') {
                 if (confirm(`Are you sure you want to completely delete ${candidateName}?`)) {
@@ -329,8 +480,16 @@
                 activeRowForEmail = row;
                 const parsedEmail = `${candidateName.toLowerCase().replace(/\s+/g, '.')}@example.com`;
                 candidateEmailInput.value = parsedEmail;
-                emailBodyTextArea.value = `Hi ${candidateName},\n\nPlease complete your Video AI Screening with ElastiCrew using the secure connection dashboard link.\n\nBest regards,\nElastiCrew Management`;
+                
                 toggleEmailModal(true);
+                
+                if(candidateSubDept === "Full Stack") {
+                    inviteQuestionSetSelect.value = "Engineering|Full Stack|Junior(1-3)";
+                } else {
+                    inviteQuestionSetSelect.value = "Operations|HR|Fresher(0)";
+                }
+                
+                updateInviteQuestionSetTicker();
                 dropdown.value = "";
             }
             else if (selectedAction !== "") {
@@ -342,46 +501,62 @@
         emailInviteForm.addEventListener('submit', function(e) {
             e.preventDefault();
             if (activeRowForEmail) {
-                activeRowForEmail.setAttribute('data-stage', 'Interviewing');
-                activeRowForEmail.cells[3].innerHTML = `<span class="stage-tag interviewing">Interviewing</span>`;
-                alert("Video Bot Invite Dispatched!");
+                const selectedOpt = inviteQuestionSetSelect.options[inviteQuestionSetSelect.selectedIndex];
+                activeRowForEmail.setAttribute('data-stage', 'Video Screening Pending');
+                activeRowForEmail.cells[3].innerHTML = `<span class="stage-tag interviewing">Video Screening Pending</span>`;
+                alert(`Video Bot Invite Dispatched Successfully!\nQuestion Set Matrix Attached: ${selectedOpt.text}`);
                 toggleEmailModal(false);
                 filterCandidates();
             }
         });
 
-        // FIXED SUBMISSION LIFECYCLE
         candidateForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
             const dept = document.getElementById('department').value;
             const subDept = document.getElementById('subDepartment').value;
-            const exp = document.getElementById('experience').value;
             const resumeFile = document.getElementById('resume').files[0];
 
             if (!resumeFile) return;
 
             const computedName = cleanNameFromFilename(resumeFile.name);
-            const computedId = `EC-2026-00${currentIdCounter++}`;
-            const defaultStage = 'Screening';
+            const defaultStage = 'Video Screening Pending';
+
+            // Fixed ISO Date generation (stripping time elements)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const currentTimestamp = `${year}-${month}-${day}`;
 
             const newRow = document.createElement('tr');
             newRow.className = 'candidate-row';
-            newRow.setAttribute('data-id', computedId); 
             newRow.setAttribute('data-name', computedName);
             newRow.setAttribute('data-dept', dept); 
             newRow.setAttribute('data-subdept', subDept); 
             newRow.setAttribute('data-stage', defaultStage);
+            newRow.setAttribute('data-status', 'Active');
 
             newRow.innerHTML = `
-                <td><span class="id-badge">${computedId}</span></td>
+                <td><span class="timestamp-txt">${currentTimestamp}</span></td>
                 <td><strong>${computedName}</strong></td>
                 <td>${subDept}</td>
-                <td><span class="stage-tag screening">${defaultStage}</span></td>
+                <td><span class="stage-tag screening">Video Screening Pending</span></td>
                 <td><span class="resume-tag">📄 ${resumeFile.name}</span></td>
-                <td style="text-align: right;">
+                <td>
+                    <div class="status-select-wrapper">
+                        <select class="grid-status-dropdown status-active" onchange="updateRowStatusStyle(this)">
+                            <option value="Active" selected>Active</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Hired">Hired</option>
+                            <option value="Withdrawn">Withdrawn</option>
+                        </select>
+                    </div>
+                </td>
+                <td style="text-align: right; padding-right: 24px;">
                     <select class="action-dropdown" onchange="handleAction(this)">
-                        <option value="" disabled selected>Manage Actions</option>
+                        <option value="" disabled selected>Manage</option>
                         <option value="video">Send Video Bot Invite</option>
                         <option value="mcq">Send MCQ Assessment Invite</option>
                         <option value="tech">Send Technical Interview Invite</option>
@@ -396,7 +571,6 @@
             filterCandidates();
         });
 
-        // Initialize Runtime setup
         filterCandidates();
     </script>
 </body>

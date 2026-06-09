@@ -390,8 +390,22 @@
         }
 
         function saveCurrentMatrixConfig() {
-            alert(`Success: Question configuration pool set for ${matrixDept.value} -> ${matrixSubDept.value} (${matrixExp.value}) has been updated and locked.`);
-        }
+    // 1. Pull current questions array from workspace list views
+    const key = `${matrixDept.value}|${matrixSubDept.value}|${matrixExp.value}`;
+    const inputs = videoQuestionStackBox.getElementsByClassName('q-text-input');
+    let currentSetQuestions = [];
+    
+    Array.from(inputs).forEach(input => {
+        if(input.value.trim() !== "") currentSetQuestions.push(input.value.trim());
+    });
+
+    // 2. Fetch existing pool database state string object, overwrite target key, commit back to storage
+    let currentPools = JSON.parse(localStorage.getItem('elasticrew_question_matrix')) || baselineFallbackDatabase;
+    currentPools[key] = currentSetQuestions;
+    localStorage.setItem('elasticrew_question_matrix', JSON.stringify(currentPools));
+
+    alert(`Success: Question configuration pool set for ${matrixDept.value} -> ${matrixSubDept.value} (${matrixExp.value}) has been updated globally.`);
+}
 
         // MCQ Upload Actions
         function triggerNativeFileSelect() { document.getElementById('nativeFileInput').click(); }

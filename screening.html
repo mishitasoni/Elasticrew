@@ -14,19 +14,157 @@
         }
         
         /* Strict column width constraints to enforce perfect vertical lines */
-        .col-name { width: 25%; }
-        .col-dept { width: 20%; }
-        .col-status { width: 25%; }
-        .col-resume { width: 20%; }
-        .col-action { width: 10%; text-align: right; }
+        .col-name { width: 18%; }
+        .col-dept { width: 14%; }
+        .col-invited { width: 12%; }
+        .col-completed { width: 12%; }
+        .col-status { width: 16%; }
+        .col-action { width: 14%; text-align: left; }
+        .col-remarks { width: 14%; text-align: right; }
 
-        /* Ensure standard inline alignment elements scale cleanly */
         .candidate-table td strong {
             display: block;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 220px;
+            max-width: 170px;
+        }
+
+        .timestamp-txt {
+            font-family: monospace;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* --- IMMUTABLE STABLE ASPECT-RATIO VIDEO VIEWPORT --- */
+        .locked-video-viewport {
+            width: 100%;
+            aspect-ratio: 16 / 9; /* Enforces absolute size geometry across all question pathways */
+            background: #000000;
+            border-radius: 6px;
+            object-fit: cover; /* Stops frame expansion regardless of varying video metadata footprints */
+            display: block;
+        }
+
+        /* --- UI RESOLVED CAPTIVE MODAL BACKDROPS --- */
+        .recording-popup-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+        .recording-popup-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Constrained structural grid covering exactly 60% of viewport area cleanly */
+        .premium-60-modal {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 60vw !important;
+            height: 60vh !important;
+            min-width: 820px;
+            max-width: 95%;
+            max-height: 90vh;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+        }
+
+        .modal-left-media { 
+            background: #0f141c; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 18px; 
+            box-sizing: border-box;
+            justify-content: space-between;
+        }
+        .modal-right-data { 
+            background: #ffffff; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 20px; 
+            min-width: 0; 
+            border-left: 1px solid #e2e8f0;
+            box-sizing: border-box;
+        }
+
+        /* Compact Horizontal Navigation Buttons */
+        .modal-q-nav-strip {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            margin-top: 14px;
+            flex-shrink: 0;
+        }
+        .modal-q-node {
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            padding: 6px 0;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .modal-q-node:hover { background: #334155; color: #fff; }
+        .modal-q-node.active-q { background: #7c3aed; color: #fff; border-color: #6d28d9; }
+
+        .box-scroll-transcript { 
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 6px; 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 12px; 
+            font-size: 12.5px; 
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+
+        /* --- CONSTRAINED ADMINISTRATIVE REMARKS POPUP MODAL --- */
+        .remarks-popup-card {
+            max-width: 460px;
+            width: 90%;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+        .remarks-textarea-modal {
+            width: 100%;
+            height: 130px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 13px;
+            color: #1e293b;
+            resize: none;
+            background: #f8fafc;
+            box-sizing: border-box;
+            font-family: inherit;
+            margin-bottom: 14px;
+            transition: all 0.12s ease;
+        }
+        .remarks-textarea-modal:focus {
+            background: #ffffff;
+            border-color: #2563eb;
+            outline: none;
         }
     </style>
 </head>
@@ -35,7 +173,7 @@
     <nav class="sidebar">
         <div class="sidebar-header"><h1 class="sidebar-brand">ElastiCrew</h1></div>
         <ul class="nav-menu">
-             <li class="nav-menu-item active"><a href="candidates.html"><span>Candidates</span></a></li>
+            <li class="nav-menu-item"><a href="candidates.html"><span>Candidates</span></a></li>
             <li class="nav-menu-item"><a href="assessments.html"><span>Assessments</span></a></li>
             <li class="nav-menu-item"><a href="reports.html"><span>Reports</span></a></li>
             <li class="nav-menu-item"><a href="dashboard.html"><span>Dashboard</span></a></li>
@@ -47,7 +185,7 @@
 
     <main class="main-content">
         <header class="header-actions">
-            <h1 class="page-title">Candidates</h1>
+            <h1 class="page-title">Video Bot AI Screening</h1>
         </header>
 
         <section class="candidates-section">
@@ -72,11 +210,11 @@
                         <option value="UI/UX">UI/UX</option>
                     </select>
                     <select id="filterStatus" class="filter-select">
-                        <option value="all">All Video Statuses</option>
+                        <option value="all">All Bot Screening Status</option>
                         <option value="Completed">Completed</option>
-                        <option value="Pending">Pending (Yet to appear)</option>
+                        <option value="Pending">Pending</option>
                         <option value="Expired">Link Expired</option>
-                        <option value="Cancelled">Cancelled (Left Halfway)</option>
+                        <option value="Cancelled">Could not complete</option>
                     </select>
                 </div>
             </div>
@@ -110,74 +248,76 @@
                     <tr>
                         <th class="grid-layout-th col-name">Candidate Name</th>
                         <th class="grid-layout-th col-dept">Sub Dept</th>
-                        <th class="grid-layout-th col-status">Video Screening Status</th>
-                        <th class="grid-layout-th col-resume">ElastiCrew Resume</th>
-                        <th class="grid-layout-th col-action" style="padding-right: 24px;">Action</th>
+                        <th class="grid-layout-th col-invited">Date Invited</th>
+                        <th class="grid-layout-th col-completed">Date Completed</th>
+                        <th class="grid-layout-th col-status">Screening Status</th>
+                        <th class="grid-layout-th col-action">Action</th>
+                        <th class="grid-layout-th col-remarks" style="padding-right: 24px;">Admin Notes</th>
                     </tr>
                 </thead>
                 <tbody id="candidateListBody">
-                    <tr class="candidate-row" data-name="Alan Turing" data-dept="Engineering" data-subdept="Backend" data-status="Pending">
+                    <tr class="candidate-row" data-name="Alan Turing" data-dept="Engineering" data-subdept="Backend" data-status="Pending" data-remarks="">
                         <td class="grid-layout-td col-name"><strong>Alan Turing</strong></td>
                         <td class="grid-layout-td col-dept">Backend</td>
-                        <td class="grid-layout-td col-status"><span class="stage-tag screening">Pending (Yet to appear)</span></td>
-                        <td class="grid-layout-td col-resume"><span class="resume-tag">📄 turing_cv.pdf</span></td>
+                        <td class="grid-layout-td col-invited"><span class="timestamp-txt">2026-06-01</span></td>
+                        <td class="grid-layout-td col-completed"><span class="timestamp-txt">—</span></td>
+                        <td class="grid-layout-td col-status"><span class="stage-tag screening">Pending</span></td>
                         <td class="grid-layout-td col-action">
                             <select class="action-dropdown" onchange="handleAction(this)">
                                 <option value="" disabled selected>Manage</option>
                                 <option value="reshare">Reshare Link</option>
-                                <option value="MCQ">Send MCQ Assessment Invite</option>
-                                <option value="tech">Send Tech Interview Invite</option>
-                                <option value="hr">Send Hr Interview Invite</option>
                                 <option value="delete" class="danger-option">Delete</option>
                             </select>
                         </td>
+                        <td class="grid-layout-td col-remarks" style="padding-right: 24px;">
+                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px; color:#475569; border-color:#cbd5e1;" onclick="triggerRemarksModal('Alan Turing')">View/Edit Remarks</button>
+                        </td>
                     </tr>
-                    <tr class="candidate-row" data-name="Grace Hopper" data-dept="Engineering" data-subdept="Full Stack" data-status="Completed">
+                    <tr class="candidate-row" data-name="Grace Hopper" data-dept="Engineering" data-subdept="Full Stack" data-status="Completed" data-remarks="Strong vocabulary index, clear structural responses across text sync pools.">
                         <td class="grid-layout-td col-name"><strong>Grace Hopper</strong></td>
                         <td class="grid-layout-td col-dept">Full Stack</td>
+                        <td class="grid-layout-td col-invited"><span class="timestamp-txt">2026-05-28</span></td>
+                        <td class="grid-layout-td col-completed"><span class="timestamp-txt">2026-05-30</span></td>
                         <td class="grid-layout-td col-status"><span class="stage-tag offered">Completed</span></td>
-                        <td class="grid-layout-td col-resume"><span class="resume-tag">📄 grace_hopper.pdf</span></td>
                         <td class="grid-layout-td col-action">
-                            <select class="action-dropdown" onchange="handleAction(this)">
-                                <option value="" disabled selected>Manage</option>
-                                <option value="reshare">Reshare Link</option>
-                                <option value="MCQ">Send MCQ Assessment Invite</option>
-                                <option value="tech">Send Tech Interview Invite</option>
-                                <option value="hr">Send Hr Interview Invite</option>
-                                <option value="delete" class="danger-option">Delete</option>
-                            </select>
+                            <button class="btn-submit" style="background:#7c3aed; padding: 4px 8px; font-size:11px;" onclick="launchRecordingPlayerModal('Grace Hopper')">View Recording</button>
+                        </td>
+                        <td class="grid-layout-td col-remarks" style="padding-right: 24px;">
+                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px; color:#475569; border-color:#cbd5e1;" onclick="triggerRemarksModal('Grace Hopper')">View/Edit Remarks</button>
                         </td>
                     </tr>
-                    <tr class="candidate-row" data-name="Ada Lovelace" data-dept="Engineering" data-subdept="Frontend" data-status="Expired">
+                    <tr class="candidate-row" data-name="Ada Lovelace" data-dept="Engineering" data-subdept="Frontend" data-status="Expired" data-remarks="">
                         <td class="grid-layout-td col-name"><strong>Ada Lovelace</strong></td>
                         <td class="grid-layout-td col-dept">Frontend</td>
+                        <td class="grid-layout-td col-invited"><span class="timestamp-txt">2026-05-15</span></td>
+                        <td class="grid-layout-td col-completed"><span class="timestamp-txt">—</span></td>
                         <td class="grid-layout-td col-status"><span class="stage-tag rejected">Link Expired</span></td>
-                        <td class="grid-layout-td col-resume"><span class="resume-tag">📄 ada_dev.pdf</span></td>
                         <td class="grid-layout-td col-action">
                             <select class="action-dropdown" onchange="handleAction(this)">
                                 <option value="" disabled selected>Manage</option>
                                 <option value="reshare">Reshare Link</option>
-                                <option value="MCQ">Send MCQ Assessment Invite</option>
-                                <option value="tech">Send Tech Interview Invite</option>
-                                <option value="hr">Send Hr Interview Invite</option>
                                 <option value="delete" class="danger-option">Delete</option>
                             </select>
                         </td>
+                        <td class="grid-layout-td col-remarks" style="padding-right: 24px;">
+                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px; color:#475569; border-color:#cbd5e1;" onclick="triggerRemarksModal('Ada Lovelace')">View/Edit Remarks</button>
+                        </td>
                     </tr>
-                    <tr class="candidate-row" data-name="Linus Torvalds" data-dept="Engineering" data-subdept="Backend" data-status="Cancelled">
+                    <tr class="candidate-row" data-name="Linus Torvalds" data-dept="Engineering" data-subdept="Backend" data-status="Cancelled" data-remarks="">
                         <td class="grid-layout-td col-name"><strong>Linus Torvalds</strong></td>
                         <td class="grid-layout-td col-dept">Backend</td>
-                        <td class="grid-layout-td col-status"><span class="stage-tag profiling-cancelled">Cancelled (Left Halfway)</span></td>
-                        <td class="grid-layout-td col-resume"><span class="resume-tag">📄 kernel_master.pdf</span></td>
+                        <td class="grid-layout-td col-invited"><span class="timestamp-txt">2026-05-20</span></td>
+                        <td class="grid-layout-td col-completed"><span class="timestamp-txt">—</span></td>
+                        <td class="grid-layout-td col-status"><span class="stage-tag profiling-cancelled">Could not complete</span></td>
                         <td class="grid-layout-td col-action">
                             <select class="action-dropdown" onchange="handleAction(this)">
                                 <option value="" disabled selected>Manage</option>
                                 <option value="reshare">Reshare Link</option>
-                                <option value="MCQ">Send MCQ Assessment Invite</option>
-                                <option value="tech">Send Tech Interview Invite</option>
-                                <option value="hr">Send Hr Interview Invite</option>
                                 <option value="delete" class="danger-option">Delete</option>
                             </select>
+                        </td>
+                        <td class="grid-layout-td col-remarks" style="padding-right: 24px;">
+                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px; color:#475569; border-color:#cbd5e1;" onclick="triggerRemarksModal('Linus Torvalds')">View/Edit Remarks</button>
                         </td>
                     </tr>
                 </tbody>
@@ -187,8 +327,8 @@
     </main>
 
     <div class="modal-overlay" id="emailModalOverlay">
-        <div class="modal-card email-modal-card">
-            <h2 class="modal-header">Reshare Video Bot Screening Link</h2>
+        <div class="modal-card email-modal-card" style="max-width:460px; width:90%;">
+            <h2 class="modal-header" style="font-size:16px;">Reshare Video Screening Link</h2>
             <form id="emailInviteForm">
                 <div class="form-group">
                     <label>Sender</label>
@@ -204,17 +344,87 @@
                 </div>
                 <div class="form-group">
                     <label>Email Message Body</label>
-                    <textarea id="emailBody" class="form-control textarea-body" rows="8" required></textarea>
+                    <textarea id="emailBody" class="form-control textarea-body" rows="5" style="resize:none;" required></textarea>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" id="closeEmailModalBtn">Cancel</button>
-                    <button type="submit" class="btn-submit dispatch-btn">Reshare Link</button>
+                <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button type="button" class="btn-secondary" id="closeEmailModalBtn" style="padding:6px 12px; font-size:12px;">Cancel</button>
+                    <button type="submit" class="btn-submit dispatch-btn" style="padding:6px 12px; font-size:12px;">Reshare Link</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <div class="recording-popup-backdrop" id="recordingPlayerModal" onclick="closePopupOnBackdrop(event, 'recordingPlayerModal')">
+        <div class="premium-60-modal">
+            
+            <div class="modal-left-media">
+                <div style="flex-grow:1; display:flex; align-items:center; justify-content:center; min-height:0;">
+                    <video id="modalMainVideoBox" controls class="locked-video-viewport">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    </video>
+                </div>
+                
+                <div class="modal-q-nav-strip">
+                    <div class="modal-q-node active-q" onclick="jumpToTargetQuestionIndex(1, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q1</div>
+                    <div class="modal-q-node" onclick="jumpToTargetQuestionIndex(2, 'https://www.w3schools.com/html/movie.mp4')">Q2</div>
+                    <div class="modal-q-node" onclick="jumpToTargetQuestionIndex(3, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q3</div>
+                    <div class="modal-q-node" onclick="jumpToTargetQuestionIndex(4, 'https://www.w3schools.com/html/movie.mp4')">Q4</div>
+                    <div class="modal-q-node" onclick="jumpToTargetQuestionIndex(5, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q5</div>
+                    <div class="modal-q-node" onclick="jumpToTargetQuestionIndex(6, 'https://www.w3schools.com/html/movie.mp4')">Q6</div>
+                    <div class="modal-q-node" onclick="jumpToTargetQuestionIndex(7, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q7</div>
+                    <div class="modal-q-node" onclick="jumpToTargetQuestionIndex(8, 'https://www.w3schools.com/html/movie.mp4')">Q8</div>
+                </div>
+            </div>
+
+            <div class="modal-right-data">
+                <div class="flex-between" style="border-bottom:1px solid #e2e8f0; padding-bottom:8px; flex-shrink:0;">
+                    <div>
+                        <h3 id="modalCandidateLabel" style="font-size:14px; font-weight:800; color:#0f172a; margin:0;">Grace Hopper</h3>
+                        <p id="modalActiveQuestionLabel" style="font-size:11px; color:#64748b; margin:2px 0 0 0; font-weight:600;">Question 1 Active</p>
+                    </div>
+                    <button style="background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8; line-height:1;" onclick="toggleRecordingModal()">&times;</button>
+                </div>
+                
+                <div class="box-scroll-transcript" id="modalTranscriptBox">
+                    <p style="margin:0 0 6px 0; color:#1e3a8a; font-weight:700; font-size:11.5px; text-transform:uppercase;">Question Prompt:</p>
+                    <p id="modalQuestionTextElement" style="font-style:italic; margin:0 0 14px 0; color:#475569;">"Walk us through your experience building decoupled microservices architectures..."</p>
+                    <hr style="border:none; border-top:1px solid #f1f5f9; margin-bottom:12px;">
+                    <p style="margin:0 0 6px 0; color:#10b981; font-weight:700; font-size:11.5px; text-transform:uppercase;">Response Transcript:</p>
+                    <p id="modalAnswerTextElement" style="color:#1e293b; margin:0;">"I leverage decoupled container configurations routed natively over proxy handlers to distribute cross-origin data loads securely without bottleneck lags..."</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="recording-popup-backdrop" id="remarksModalOverlay" onclick="closePopupOnBackdrop(event, 'remarksModalOverlay')">
+        <div class="modal-card remarks-popup-card">
+            <div class="flex-between" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin:0;" id="remarksModalHeaderTitle">Administrative Remarks</h3>
+                <button style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height:1;" onclick="closeRemarksModal()">&times;</button>
+            </div>
+            
+            <textarea id="modalRemarksTextarea" class="remarks-textarea-modal" placeholder="Type diagnostic notes or screening feedback here..."></textarea>
+            
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="closeRemarksModal()">Cancel</button>
+                <button class="btn-submit" style="background-color: var(--primary-blue); padding:6px 12px; font-size:12px;" onclick="saveRemarksModalPayload()">Save & Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        const qaScriptMatrix = {
+            1: { q: "Walk us through your experience building decoupled microservices architectures?", a: "I leverage decoupled container configurations routed natively over proxy handlers to distribute cross-origin data loads securely without bottleneck lags..." },
+            2: { q: "How do you secure connection token pipelines against routing exceptions?", a: "Routines drop payload queries instantly if state lookups discover missing signature maps inside header strings." },
+            3: { q: "Describe your approach to standard database execution analysis queries.", a: "Isolating operations using explain-analyze allows our modules to deploy targeted indexes where traversal paths spike." },
+            4: { q: "How do you manage cross-origin resource whitelisting structures securely?", a: "Whitelists are externalized out of core source images and evaluated sequentially during middleware validation sweeps." },
+            5: { q: "What logging steps do you enforce when tracking API error cascades?", a: "Routines emit structured trace tokens straight to independent error log aggregators for automated diagnostic auditing." },
+            6: { q: "Explain your container multi-stage layout assembly rules.", a: "Separating compile dependencies from final binaries ensures deployment targets stay light and strip down runtime security footprints." },
+            7: { q: "How do you optimize static rows handling inside web layers?", a: "Enforcing distributed memory cache rings allows servers to fetch asset data indices within constant time boundaries." },
+            8: { q: "How do you validate logic structures across microservices connections?", a: "We run end-to-end integration queries using mock target payloads before committing modifications back to staging." }
+        };
+
         const candidateListBody = document.getElementById('candidateListBody');
         const totalCountBubble = document.getElementById('totalCountBubble');
         const noResults = document.getElementById('noResults');
@@ -225,12 +435,18 @@
         const candidateEmailInput = document.getElementById('candidateEmail');
         const emailBodyTextArea = document.getElementById('emailBody');
 
-        const searchName = document.getElementById('searchName');
-        const filterDept = document.getElementById('filterDept');
-        const filterSubDept = document.getElementById('filterSubDept');
-        const filterStatus = document.getElementById('filterStatus');
+        const recordingPlayerModal = document.getElementById('recordingPlayerModal');
+        const modalMainVideoBox = document.getElementById('modalMainVideoBox');
+        const modalCandidateLabel = document.getElementById('modalCandidateLabel');
+        const modalActiveQuestionLabel = document.getElementById('modalActiveQuestionLabel');
+        const modalQuestionTextElement = document.getElementById('modalQuestionTextElement');
+        const modalAnswerTextElement = document.getElementById('modalAnswerTextElement');
 
-        let activeRowForEmail = null;
+        const remarksModalOverlay = document.getElementById('remarksModalOverlay');
+        const remarksModalHeaderTitle = document.getElementById('remarksModalHeaderTitle');
+        const modalRemarksTextarea = document.getElementById('modalRemarksTextarea');
+
+        let activeRowRef = null;
 
         function updateCounter() {
             totalCountBubble.innerText = candidateListBody.getElementsByClassName('candidate-row').length;
@@ -241,7 +457,78 @@
 
         function toggleEmailModal(show) {
             if (show) emailModalOverlay.classList.add('active');
-            else { emailModalOverlay.classList.remove('active'); emailInviteForm.reset(); activeRowForEmail = null; }
+            else { emailModalOverlay.classList.remove('active'); emailInviteForm.reset(); activeRowRef = null; }
+        }
+
+        function toggleRecordingModal() {
+            recordingPlayerModal.classList.toggle('active');
+            if(!recordingPlayerModal.classList.contains('active')) {
+                modalMainVideoBox.pause();
+                modalMainVideoBox.src = "";
+            }
+        }
+
+        // Handles backdrop modal dismissals safely
+        function closePopupOnBackdrop(e, modalId) {
+            if (e.target === document.getElementById(modalId)) {
+                if(modalId === 'recordingPlayerModal') toggleRecordingModal();
+                if(modalId === 'remarksModalOverlay') closeRemarksModal();
+            }
+        }
+
+        // Remarks popup launch configuration lifecycle
+        function triggerRemarksModal(candidateName) {
+            const rows = document.getElementsByClassName('candidate-row');
+            for(let row of rows) {
+                if(row.getAttribute('data-name') === candidateName) {
+                    activeRowRef = row;
+                    break;
+                }
+            }
+            if(activeRowRef) {
+                remarksModalHeaderTitle.innerText = `Admin Notes: ${candidateName}`;
+                modalRemarksTextarea.value = activeRowRef.getAttribute('data-remarks') || "";
+                remarksModalOverlay.classList.add('active');
+            }
+        }
+
+        function closeRemarksModal() {
+            remarksModalOverlay.classList.remove('active');
+            activeRowRef = null;
+        }
+
+        function saveRemarksModalPayload() {
+            if(activeRowRef) {
+                activeRowRef.setAttribute('data-remarks', modalRemarksTextarea.value.trim());
+                closeRemarksModal();
+            }
+        }
+
+        function launchRecordingPlayerModal(candidateName) {
+            modalCandidateLabel.innerText = candidateName;
+            jumpToTargetQuestionIndex(1, 'https://www.w3schools.com/html/mov_bbb.mp4');
+            recordingPlayerModal.classList.add('active');
+        }
+
+        function jumpToTargetQuestionIndex(qIndex, videoSrcUrl) {
+            document.querySelectorAll('.modal-q-node').forEach(node => node.classList.remove('active-q'));
+            
+            const e = window.event || (arguments.callee.caller ? arguments.callee.caller.arguments[0] : null);
+            if (e && e.currentTarget) {
+                e.currentTarget.classList.add('active-q');
+            } else {
+                const nodes = document.querySelectorAll('.modal-q-node');
+                if(nodes[qIndex - 1]) nodes[qIndex - 1].classList.add('active-q');
+            }
+
+            modalActiveQuestionLabel.innerText = `Question ${qIndex} Active`;
+            modalMainVideoBox.src = videoSrcUrl;
+            
+            const data = qaScriptMatrix[qIndex];
+            modalQuestionTextElement.innerText = `"${data.q}"`;
+            modalAnswerTextElement.innerText = `"${data.a}"`;
+            
+            modalMainVideoBox.play();
         }
 
         function filterScreeningList() {
@@ -296,7 +583,7 @@
                 dropdown.value = "";
             } 
             else if (selectedAction === 'reshare') {
-                activeRowForEmail = row;
+                activeRowRef = row;
                 const parsedEmail = `${candidateName.toLowerCase().replace(/\s+/g, '.')}@example.com`;
                 candidateEmailInput.value = parsedEmail;
 
@@ -313,9 +600,9 @@
 
         emailInviteForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            if (activeRowForEmail) {
-                activeRowForEmail.setAttribute('data-status', 'Pending');
-                activeRowForEmail.cells[2].innerHTML = `<span class="stage-tag screening">Pending (Yet to appear)</span>`;
+            if (activeRowRef) {
+                activeRowRef.setAttribute('data-status', 'Pending');
+                activeRowRef.cells[4].innerHTML = `<span class="stage-tag screening">Pending</span>`;
                 
                 alert(`Success: Brand new invite link effectively dispatched to ${candidateEmailInput.value}.`);
                 toggleEmailModal(false);
