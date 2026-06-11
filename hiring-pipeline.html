@@ -392,9 +392,8 @@
                             <td><div class="timestamp-txt" style="color:#64748b;">06 Jun 2026</div></td>
                             <td><span class="status-badge" style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending Review</span></td>
                             <td style="text-align: center;">
-                                <button onclick="openNotesModal('Alan Turing')" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f59e0b; border: none; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                    <span style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #10b981; border-radius: 50%; border: 2px solid white;"></span>
+                                <button onclick="openNotesModal('Alan Turing', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                 </button>
                             </td>
                             <td style="text-align: right; padding-right: 20px;">
@@ -420,7 +419,7 @@
                             <td><div class="timestamp-txt" style="color:#64748b;">02 Jun 2026</div></td>
                             <td><span class="status-badge" style="background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Link Expire</span></td>
                             <td style="text-align: center;">
-                                <button onclick="openNotesModal('Ada Lovelace')" style="width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                <button onclick="openNotesModal('Ada Lovelace', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                 </button>
                             </td>
@@ -447,7 +446,7 @@
                             <td><div class="timestamp-txt" style="color:#64748b;">11 Jun 2026</div></td>
                             <td><span class="status-badge" style="background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending</span></td>
                             <td style="text-align: center;">
-                                <button onclick="openNotesModal('Margaret Hamilton')" style="width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                <button onclick="openNotesModal('Margaret Hamilton', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                 </button>
                             </td>
@@ -474,7 +473,7 @@
                             <td><div class="timestamp-txt" style="color:#64748b;">09 Jun 2026</div></td>
                             <td><span class="status-badge" style="background: #ffedd5; color: #c2410c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Could not Complete</span></td>
                             <td style="text-align: center;">
-                                <button onclick="openNotesModal('John von Neumann')" style="width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                <button onclick="openNotesModal('John von Neumann', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                 </button>
                             </td>
@@ -930,22 +929,59 @@
                 </button>
             </div>
             <div style="padding: 20px;">
-                <textarea style="width: 100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box;" placeholder="Add private HR notes here..."></textarea>
+                <textarea id="hrNotesTextarea" style="width: 100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box;" placeholder="Add private HR notes here..."></textarea>
             </div>
             <div style="padding: 16px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px;">
                 <button onclick="closeNotesModal()" class="btn-secondary" style="padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">Cancel</button>
-                <button onclick="closeNotesModal()" class="btn-primary" style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--primary-blue); color: white; font-weight: 600; cursor: pointer;">Save Notes</button>
+                <button onclick="saveNotes()" class="btn-primary" style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--primary-blue); color: white; font-weight: 600; cursor: pointer;">Save Notes</button>
             </div>
         </div>
     </div>
 
     <script>
-        function openNotesModal(candidateName) {
+        let activeNoteBtn = null;
+
+        function openNotesModal(candidateName, btnElement) {
             document.getElementById('notesCandidateName').innerText = candidateName;
+            activeNoteBtn = btnElement;
+            
+            const existingNote = btnElement.getAttribute('data-note') || '';
+            document.getElementById('hrNotesTextarea').value = existingNote;
+            
             document.getElementById('hrNotesModal').classList.add('active');
         }
+
         function closeNotesModal() {
             document.getElementById('hrNotesModal').classList.remove('active');
+            activeNoteBtn = null;
+        }
+
+        function saveNotes() {
+            if (!activeNoteBtn) return;
+            
+            const textarea = document.getElementById('hrNotesTextarea');
+            const noteContent = textarea.value.trim();
+            
+            if (noteContent.length > 0) {
+                activeNoteBtn.setAttribute('data-note', noteContent);
+                activeNoteBtn.style.background = '#f59e0b';
+                activeNoteBtn.style.border = 'none';
+                activeNoteBtn.style.boxShadow = '0 2px 4px rgba(245, 158, 11, 0.3)';
+                activeNoteBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #10b981; border-radius: 50%; border: 2px solid white;"></span>
+                `;
+            } else {
+                activeNoteBtn.removeAttribute('data-note');
+                activeNoteBtn.style.background = '#f8fafc';
+                activeNoteBtn.style.border = '1px solid #e2e8f0';
+                activeNoteBtn.style.boxShadow = 'none';
+                activeNoteBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                `;
+            }
+            
+            closeNotesModal();
         }
     </script>
 </body>
