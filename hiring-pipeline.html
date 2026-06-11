@@ -365,24 +365,24 @@
                 <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">Pending Action Queue <span style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">2</span></h2>
                 <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates awaiting your review or reminder.</p>
             </div>
-            <div class="table-responsive-wrapper">
+                        <div class="table-responsive-wrapper">
                 <table class="candidate-table enterprise-table" style="width: 100%;">
                     
                     <thead>
                         <tr>
-                            
-                            <th>Candidate</th>
-                            <th>Role</th>
-                            <th>Invited On</th>
-                            <th>Submitted On</th>
-                            <th>Recommended Action</th>
+                            <th>Candidate_ID</th>
+                            <th>Name</th>
+                            <th>Sub Department</th>
+                            <th>Invite Date</th>
+                            <th>Status</th>
+                            <th>HR Notes</th>
                             <th style="text-align: right; padding-right: 20px;">Actions</th>
                         </tr>
                     </thead>
                     <!-- Row 1 -->
                     <tbody class="candidate-row-group">
                         <tr class="enterprise-row">
-                            
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1042</span></td>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <div class="avatar-circle">AT</div>
@@ -391,11 +391,8 @@
                             </td>
                             <td>Backend Eng</td>
                             <td><div class="timestamp-txt" style="color:#64748b;">06 Jun 2026</div></td>
-                            <td>
-                                <div class="timestamp-txt" style="color:#1e293b;">08 Jun 2026</div>
-                            </td>
-                            
-                            <td><strong style="color:var(--primary-blue);">View Screening Result</strong></td>
+                            <td><span class="status-badge" style="background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending Review</span></td>
+                            <td style="color: #475569; font-size: 13px; max-width: 200px; white-space: normal;">Excellent background in computing logic. Requires technical screen.</td>
                             <td style="text-align: right; padding-right: 20px;">
                                 <div style="display: flex; justify-content: flex-end; gap: 6px;">
                                     <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; height: 32px; background: white; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">Send Invite</button>
@@ -406,10 +403,10 @@
                             </td>
                         </tr>
                     </tbody>
-                    <!-- Row 4 -->
+                    <!-- Row 2 -->
                     <tbody class="candidate-row-group">
                         <tr class="enterprise-row">
-                            
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1045</span></td>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <div class="avatar-circle">AL</div>
@@ -418,11 +415,8 @@
                             </td>
                             <td>Frontend Eng</td>
                             <td><div class="timestamp-txt" style="color:#64748b;">02 Jun 2026</div></td>
-                            <td>
-                                <div class="timestamp-txt" style="color:#64748b;">Not Submitted</div>
-                            </td>
-                            
-                            <td><strong style="color:#b91c1c;">Send Reminder</strong></td>
+                            <td><span class="status-badge" style="background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Invite Expired</span></td>
+                            <td style="color: #475569; font-size: 13px; max-width: 200px; white-space: normal;">Did not complete screening within 48h.</td>
                             <td style="text-align: right; padding-right: 20px;">
                                 <div style="display: flex; justify-content: flex-end; gap: 6px;">
                                     <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; height: 32px; background: white; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">Send Invite</button>
