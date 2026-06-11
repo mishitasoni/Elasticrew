@@ -162,13 +162,8 @@
                 transition: all 0.4s ease;
             }
             
-            .pipeline-step.completed {
-                background: #f0fdf4;
-                color: #166534;
-            }
-            .pipeline-step.completed svg {
-                color: #16a34a;
-            }
+
+
             
             .pipeline-step.active {
                 background: var(--primary-blue) !important;
@@ -194,31 +189,27 @@
                 border-radius: 2px;
                 transition: all 0.4s ease;
             }
-            .step-connector.completed {
-                background: #22c55e;
-            }
-            .step-connector.active-path {
-                background: #22c55e;
-            }
+
+
         </style>
         <div class="pipeline-stepper">
             <!-- Step 1 -->
-            <a href="hiring-pipeline.html?v=3" class="pipeline-step completed">
+            <a href="hiring-pipeline.html?v=3" class="pipeline-step ">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M23 7l-7 5 7 5V7z"></path>
                     <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
                 </svg>
                 <span>Video Bot Screening</span>
             </a>
-            <div class="step-connector completed"></div>
+            <div class="step-connector "></div>
             <!-- Step 2 -->
-            <a href="#" class="pipeline-step completed">
+            <a href="#" class="pipeline-step ">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 </svg>
                 <span>MCQ Assessment</span>
             </a>
-            <div class="step-connector active-path"></div>
+            <div class="step-connector "></div>
             <!-- Step 3 -->
             <a href="tech-scheduler.html?v=3" class="pipeline-step active">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
