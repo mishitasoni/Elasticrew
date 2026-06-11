@@ -362,10 +362,10 @@
         <section class="candidates-section">
             
             <div style="margin-top: 30px; margin-bottom: 12px; padding-left: 24px;">
-                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">Pending Action Queue <span style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">2</span></h2>
+                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">Pending Action Queue <span style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">4</span></h2>
                 <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates awaiting your review or reminder.</p>
             </div>
-                        <div class="table-responsive-wrapper">
+                                    <div class="table-responsive-wrapper">
                 <table class="candidate-table enterprise-table" style="width: 100%;">
                     
                     <thead>
@@ -385,14 +385,13 @@
                             <td><span style="font-family: monospace; color: #64748b;">#C-1042</span></td>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    
                                     <div><strong>Alan Turing</strong></div>
                                 </div>
                             </td>
                             <td>Backend Eng</td>
                             <td><div class="timestamp-txt" style="color:#64748b;">06 Jun 2026</div></td>
-                            <td><span class="status-badge" style="background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending Review</span></td>
-                            <td style="color: #475569; font-size: 13px; max-width: 200px; white-space: normal;">Excellent background in computing logic. Requires technical screen.</td>
+                            <td><span class="status-badge" style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending Review</span></td>
+                            <td style="color: #475569; font-size: 13px; max-width: 200px; white-space: normal;">Screening successfully submitted. Awaiting HR evaluation.</td>
                             <td style="text-align: right; padding-right: 20px;">
                                 <div style="display: flex; justify-content: flex-end; gap: 6px;">
                                     <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; height: 32px; background: white; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">Send Invite</button>
@@ -409,18 +408,63 @@
                             <td><span style="font-family: monospace; color: #64748b;">#C-1045</span></td>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    
                                     <div><strong>Ada Lovelace</strong></div>
                                 </div>
                             </td>
                             <td>Frontend Eng</td>
                             <td><div class="timestamp-txt" style="color:#64748b;">02 Jun 2026</div></td>
-                            <td><span class="status-badge" style="background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Invite Expired</span></td>
-                            <td style="color: #475569; font-size: 13px; max-width: 200px; white-space: normal;">Did not complete screening within 48h.</td>
+                            <td><span class="status-badge" style="background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Link Expire</span></td>
+                            <td style="color: #475569; font-size: 13px; max-width: 200px; white-space: normal;">Did not complete screening within 48h window.</td>
                             <td style="text-align: right; padding-right: 20px;">
                                 <div style="display: flex; justify-content: flex-end; gap: 6px;">
                                     <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; height: 32px; background: white; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">Send Invite</button>
                                     <button class="btn-primary-action">Send Reminder</button>
+                                    <button class="btn-primary-action"
+                                        style="padding: 6px 10px; color: #64748b; background:#f1f5f9;">&#8942;</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Row 3 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1048</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Margaret Hamilton</strong></div>
+                                </div>
+                            </td>
+                            <td>Systems Eng</td>
+                            <td><div class="timestamp-txt" style="color:#64748b;">11 Jun 2026</div></td>
+                            <td><span class="status-badge" style="background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending</span></td>
+                            <td style="color: #475569; font-size: 13px; max-width: 200px; white-space: normal;">Invite sent 2 hours ago. Candidate has not opened link.</td>
+                            <td style="text-align: right; padding-right: 20px;">
+                                <div style="display: flex; justify-content: flex-end; gap: 6px;">
+                                    <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; height: 32px; background: white; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">Send Invite</button>
+                                    <button class="btn-primary-action">Send Reminder</button>
+                                    <button class="btn-primary-action"
+                                        style="padding: 6px 10px; color: #64748b; background:#f1f5f9;">&#8942;</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Row 4 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1051</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>John von Neumann</strong></div>
+                                </div>
+                            </td>
+                            <td>Data Science</td>
+                            <td><div class="timestamp-txt" style="color:#64748b;">09 Jun 2026</div></td>
+                            <td><span class="status-badge" style="background: #ffedd5; color: #c2410c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Could not Complete</span></td>
+                            <td style="color: #475569; font-size: 13px; max-width: 200px; white-space: normal;">Candidate abandoned screening at question 3.</td>
+                            <td style="text-align: right; padding-right: 20px;">
+                                <div style="display: flex; justify-content: flex-end; gap: 6px;">
+                                    <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; height: 32px; background: white; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">Send Invite</button>
+                                    <button class="btn-primary-action">Contact Candidate</button>
                                     <button class="btn-primary-action"
                                         style="padding: 6px 10px; color: #64748b; background:#f1f5f9;">&#8942;</button>
                                 </div>
