@@ -716,11 +716,17 @@ body {
 .timeline-event { font-size: 13px; color: #334155; margin-bottom: 8px; position: relative; padding-left: 12px; border-left: 2px solid #e2e8f0; }
 .recommended-action-box { background: #e0e7ff; color: var(--primary-blue); padding: 14px 20px; border-radius: 8px; margin-top: 16px; font-size: 13.5px; border: 1px solid #c7d2fe; display: flex; align-items: center; gap: 8px;}
 
-.table-responsive-wrapper { overflow-x: hidden !important; width: 100%; }
+.table-responsive-wrapper { overflow-x: auto !important; width: 100%; }
 
 .candidate-table select {
     max-width: 100%;
 }
 .candidate-table th {
     white-space: nowrap !important;
+}
+
+/* Ensure the last column has healthy right padding so it doesn't hug the edge */
+.candidate-table th:last-child,
+.candidate-table td:last-child {
+    padding-right: 32px !important;
 }
