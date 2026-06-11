@@ -246,37 +246,35 @@
         <section class="panelist-management-section" style="margin-bottom: 30px;">
             <!-- Tabs -->
             <div style="display: flex; gap: 10px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px;">
-                <!-- Active Tab -->
-                <div style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: #eff6ff; border: 1px solid #3b82f6; border-radius: 6px; cursor: pointer;">
-                    <span style="font-size: 13px; font-weight: 700; color: #1d4ed8;">Tech & Delivery</span>
-                    <span style="background: #3b82f6; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                <div onclick="selectPanelTrack('Tech and Delivery', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Tech & Delivery</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">2</span>
                 </div>
-                <!-- Inactive Tabs -->
-                <div style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer;">
-                    <span style="font-size: 13px; font-weight: 600; color: #0f172a;">Operations</span>
-                    <span style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                <div onclick="selectPanelTrack('Operations', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Operations</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer;">
-                    <span style="font-size: 13px; font-weight: 600; color: #0f172a;">HR</span>
-                    <span style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                <div onclick="selectPanelTrack('HR', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">HR</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer;">
-                    <span style="font-size: 13px; font-weight: 600; color: #0f172a;">Finance</span>
-                    <span style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                <div onclick="selectPanelTrack('Finance', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Finance</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer;">
-                    <span style="font-size: 13px; font-weight: 600; color: #0f172a;">Sales</span>
-                    <span style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                <div onclick="selectPanelTrack('Sales', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Sales</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer;">
-                    <span style="font-size: 13px; font-weight: 600; color: #0f172a;">Branding & Mktg</span>
-                    <span style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                <div onclick="selectPanelTrack('Branding & Mktg', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Branding & Mktg</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
                 </div>
             </div>
 
-            <!-- Panel Roster Card -->
-            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
-                <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">Tech and Delivery Panel Roster</h3>
+            <!-- Panel Roster Card (Hidden by default) -->
+            <div id="panelRosterCard" style="display: none; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+                <h3 id="panelRosterTitle" style="font-size: 15px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">Tech and Delivery Panel Roster</h3>
                 <p style="font-size: 12px; color: #64748b; margin: 0 0 16px 0;">Register panellists for this track below. Added users become visible when booking slots for candidates matching this department.</p>
                 
                 <button onclick="togglePanelModal(true)" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; margin-bottom: 24px;">+ Add Panellist to Track</button>
@@ -284,20 +282,90 @@
                 <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 0 -20px 20px -20px;">
                 
                 <!-- Panellist Chips -->
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px;">
+                <div id="panellistChipsContainer" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <div class="dummy-panellist-chip" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px;">
                         <span style="font-weight: 700; color: #0f172a;">Gaurav Paliwal</span>
                         <span style="color: #64748b;">(Group Manager)</span>
-                        <span style="color: #94a3b8; cursor: pointer; font-size: 14px; margin-left: 4px;">&times;</span>
+                        <span style="color: #94a3b8; cursor: pointer; font-size: 14px; margin-left: 4px;" onclick="this.parentElement.remove()">&times;</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px;">
+                    <div class="dummy-panellist-chip" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px;">
                         <span style="font-weight: 700; color: #0f172a;">Arpit Pathak</span>
                         <span style="color: #64748b;">(Manager)</span>
-                        <span style="color: #94a3b8; cursor: pointer; font-size: 14px; margin-left: 4px;">&times;</span>
+                        <span style="color: #94a3b8; cursor: pointer; font-size: 14px; margin-left: 4px;" onclick="this.parentElement.remove()">&times;</span>
                     </div>
                 </div>
             </div>
         </section>
+
+        <script>
+            function selectPanelTrack(trackName, tabElement) {
+                const tabs = document.querySelectorAll('.panel-track-tab');
+                tabs.forEach(tab => {
+                    tab.style.background = 'white';
+                    tab.style.border = '1px solid #e2e8f0';
+                    tab.querySelector('.tab-title').style.color = '#0f172a';
+                    tab.querySelector('.tab-title').style.fontWeight = '600';
+                    tab.querySelector('.tab-badge').style.background = '#f1f5f9';
+                    tab.querySelector('.tab-badge').style.color = '#64748b';
+                });
+                
+                tabElement.style.background = '#eff6ff';
+                tabElement.style.border = '1px solid #3b82f6';
+                tabElement.querySelector('.tab-title').style.color = '#1d4ed8';
+                tabElement.querySelector('.tab-title').style.fontWeight = '700';
+                tabElement.querySelector('.tab-badge').style.background = '#3b82f6';
+                tabElement.querySelector('.tab-badge').style.color = 'white';
+                
+                document.getElementById('panelRosterTitle').innerText = trackName + " Panel Roster";
+                
+                const chips = document.querySelectorAll('.dummy-panellist-chip');
+                if (trackName === 'Tech and Delivery') {
+                    chips.forEach(chip => chip.style.display = 'flex');
+                } else {
+                    chips.forEach(chip => chip.style.display = 'none');
+                }
+                
+                document.getElementById('panelRosterCard').style.display = 'block';
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const panellistForm = document.getElementById('panellistForm');
+                if (panellistForm) {
+                    panellistForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const name = document.getElementById('panelName').value;
+                        const designation = document.getElementById('panelDesignation').value;
+                        
+                        const newChip = document.createElement('div');
+                        newChip.style.cssText = "display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px; animation: fadeIn 0.3s ease-out;";
+                        newChip.innerHTML = `
+                            <span style="font-weight: 700; color: #0f172a;">${name}</span>
+                            <span style="color: #64748b;">(${designation})</span>
+                            <span style="color: #94a3b8; cursor: pointer; font-size: 14px; margin-left: 4px;" onclick="this.parentElement.remove()">&times;</span>
+                        `;
+                        
+                        document.getElementById('panellistChipsContainer').appendChild(newChip);
+                        
+                        if (typeof togglePanelModal === 'function') {
+                            togglePanelModal(false);
+                        } else {
+                            document.getElementById('panelModalOverlay').style.display = 'none';
+                        }
+                        panellistForm.reset();
+                        
+                        // Increment badge count safely
+                        const activeTab = document.querySelector('.panel-track-tab[style*="#eff6ff"]');
+                        if(activeTab) {
+                            const badge = activeTab.querySelector('.tab-badge');
+                            if(badge) {
+                                badge.innerText = parseInt(badge.innerText) + 1;
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
+        
 
 <header class="header-actions" style="margin-bottom: 20px;">
             <div>
