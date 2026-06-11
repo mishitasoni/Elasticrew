@@ -24,7 +24,6 @@
 
         .candidate-table td strong {
             display: block;
-            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 180px;
@@ -95,7 +94,7 @@
         .remove-chip-btn:hover { color: #b91c1c; }
 
         /* --- STAGE BADGE ELEMENT HIGHLIGHTS --- */
-        .stage-tag { display: inline-block; padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 12px; text-align: center; white-space: nowrap; }
+        .stage-tag { display: inline-block; padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 12px; text-align: center; }
         .stage-tag.pending { background-color: #f1f5f9; color: #475569; }
         .stage-tag.completed { background-color: #dcfce7; color: #15803d; }
         .stage-tag.cancelled { background-color: #fee2e2; color: #b91c1c; }
@@ -107,6 +106,21 @@
         .timestamp-txt { font-family: monospace; font-size: 12px; color: #1e293b; font-weight: 600; }
         .checkbox-dropdown-panel { border: 1px solid #cbd5e1; border-radius: 6px; max-height: 120px; overflow-y: auto; padding: 8px 12px; background-color: #ffffff; }
         .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; color: #334155; cursor: pointer; }
+    </style>
+
+    <style>
+        /* Strictly prevent horizontal scrolling */
+        .table-responsive-wrapper {
+            overflow-x: hidden !important;
+        }
+        .enterprise-table th {
+            word-wrap: break-word;
+            white-space: normal !important;
+            padding-right: 8px !important;
+        }
+        .enterprise-table td {
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
@@ -274,16 +288,16 @@
                 <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates Pending Technical Interview Scheduling</p>
             </div>
             <div class="table-responsive-wrapper">
-                <table class="candidate-table enterprise-table" style="width: 100%;">
+                <table class="candidate-table enterprise-table" style="width: 100%; table-layout: fixed;">
                     <thead>
                         <tr>
-                            <th style="width: 10%; white-space: nowrap; ">Candidate_ID</th>
-                            <th style="width: 20%; white-space: nowrap;">Candidate Name</th>
-                            <th style="width: 15%; white-space: nowrap;">Sub Dept.</th>
-                            <th style="width: 15%; white-space: nowrap; ">Interview Date & Time</th>
-                            <th style="width: 12%; white-space: nowrap; ">Candidate Status</th>
-                            <th style="width: 10%; white-space: nowrap; text-align: center; ">HR Notes</th>
-                            <th style="width: 18%; white-space: nowrap; text-align: right; ">Actions</th>
+                            <th style="width: 10%; ">Candidate_ID</th>
+                            <th style="width: 20%; ">Candidate Name</th>
+                            <th style="width: 15%; ">Sub Dept.</th>
+                            <th style="width: 15%; ">Interview Date & Time</th>
+                            <th style="width: 12%; ">Candidate Status</th>
+                            <th style="width: 10%; text-align: center; ">HR Notes</th>
+                            <th style="width: 18%; text-align: right; ">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="candidate-row-group">
@@ -321,19 +335,19 @@
                 <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates who have Completed Technical Interviews</p>
             </div>
             <div class="table-responsive-wrapper">
-                <table class="candidate-table enterprise-table" style="width: 100%;">
+                <table class="candidate-table enterprise-table" style="width: 100%; table-layout: fixed;">
                     <thead>
                         <tr>
-                            <th style="width: 8%; white-space: nowrap; ">CANDIDATE_ID</th>
-                            <th style="width: 12%; white-space: nowrap;">NAME</th>
-                            <th style="width: 12%; white-space: nowrap;">SUB DEPT.</th>
-                            <th style="width: 12%; white-space: nowrap; ">Assign Panelist</th>
-                            <th style="width: 10%; white-space: nowrap; ">Panelist Feedback</th>
-                            <th style="width: 10%; white-space: nowrap; ">Interview Date & Time</th>
-                            <th style="width: 10%; white-space: nowrap; ">CANDIDATE STATUS</th>
-                            <th style="width: 8%; white-space: nowrap; text-align: center; ">VIEW Recording</th>
-                            <th style="width: 8%; white-space: nowrap; text-align: center; ">HR NOTES</th>
-                            <th style="width: 10%; white-space: nowrap; text-align: right; ">ACTIONS</th>
+                            <th style="width: 8%; ">CANDIDATE_ID</th>
+                            <th style="width: 12%; ">NAME</th>
+                            <th style="width: 12%; ">SUB DEPT.</th>
+                            <th style="width: 12%; ">Assign Panelist</th>
+                            <th style="width: 10%; ">Panelist Feedback</th>
+                            <th style="width: 10%; ">Interview Date & Time</th>
+                            <th style="width: 10%; ">CANDIDATE STATUS</th>
+                            <th style="width: 8%; text-align: center; ">VIEW Recording</th>
+                            <th style="width: 8%; text-align: center; ">HR NOTES</th>
+                            <th style="width: 10%; text-align: right; ">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody class="candidate-row-group">
