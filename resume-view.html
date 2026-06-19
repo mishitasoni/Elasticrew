@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElastiCrew - Anonymized Resume View</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── PAGE LAYOUT ── */
+        .rv-page-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ── ANONYMIZED IDENTITY BANNER ── */
+        .rv-identity-banner {
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
+            border-left: 5px solid var(--primary-blue);
+            border-radius: 10px;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .rv-identity-left { display: flex; align-items: center; gap: 16px; }
+        .rv-anon-avatar {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: linear-gradient(135deg, #0E2D7B, #3b82f6);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .rv-anon-avatar svg { color: #ffffff; }
+        .rv-role-block h2 {
+            font-size: 18px; font-weight: 800; color: var(--text-dark);
+            margin: 0 0 4px 0; letter-spacing: -0.3px;
+        }
+        .rv-role-block p { font-size: 13px; color: var(--text-muted); margin: 0; }
+        .rv-privacy-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #fef3c7; color: #92400e;
+            border: 1px solid #fde68a;
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 700;
+        }
+
+        /* ── THREE-COLUMN CONTENT GRID ── */
+        .rv-grid {
+            display: grid;
+            grid-template-columns: 260px 1fr 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        /* ── SECTION CARD ── */
+        .rv-card {
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .rv-card-title {
+            font-size: 11px; font-weight: 800; color: #1e3a8a;
+            text-transform: uppercase; letter-spacing: 0.6px;
+            border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;
+        }
+
+        /* ── KPI SCORE ROWS ── */
+        .rv-score-row {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            gap: 8px; font-size: 12.5px;
+        }
+        .rv-score-label { color: var(--text-main); font-weight: 500; flex: 1; }
+        .rv-score-bar-track {
+            flex: 2; height: 7px; background: #e2e8f0;
+            border-radius: 4px; overflow: hidden;
+        }
+        .rv-score-bar-fill {
+            height: 100%; border-radius: 4px;
+            background: linear-gradient(90deg, #0E2D7B, #3b82f6);
+        }
+        .rv-score-value {
+            font-size: 12px; font-weight: 700; color: var(--text-dark);
+            min-width: 32px; text-align: right;
+        }
+
+        /* ── BADGE LISTS ── */
+        .rv-badge { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 5px; }
+        .rv-badge-green { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+        .rv-badge-purple { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+        .rv-badge-list { display: flex; flex-wrap: wrap; gap: 5px; }
+
+        /* ── TIMELINE ENTRIES ── */
+        .rv-timeline-entry {
+            border-left: 3px solid #e2e8f0;
+            padding-left: 12px;
+            margin-bottom: 12px;
+        }
+        .rv-timeline-entry:last-child { margin-bottom: 0; }
+        .rv-entry-title { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; }
+        .rv-entry-org { font-size: 12px; color: #2563eb; font-weight: 600; margin-bottom: 3px; }
+        .rv-entry-period { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+        .rv-entry-body { font-size: 12.5px; color: var(--text-main); line-height: 1.5; }
+
+        /* ── HIGHLIGHT BULLETS ── */
+        .rv-bullet-list { list-style: none; padding: 0; margin: 0; }
+        .rv-bullet-list li {
+            padding: 5px 0 5px 18px;
+            position: relative;
+            font-size: 12.5px; color: var(--text-main); line-height: 1.5;
+            border-bottom: 1px solid #f8fafc;
+        }
+        .rv-bullet-list li:last-child { border-bottom: none; }
+        .rv-bullet-list li::before {
+            content: '▸'; position: absolute; left: 0;
+            color: var(--primary-blue); font-size: 11px; top: 6px;
+        }
+
+        /* ── PIPELINE STAGE PILL ── */
+        .rv-pipeline-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 700;
+        }
+        .rv-pipeline-pill.completed { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .rv-pipeline-pill.pending { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .rv-pipeline-pill.interviewing { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+
+        /* ── INFO ROW ── */
+        .rv-info-row {
+            display: flex; align-items: flex-start; gap: 10px;
+            font-size: 12.5px; padding: 7px 0;
+            border-bottom: 1px solid #f8fafc;
+        }
+        .rv-info-row:last-child { border-bottom: none; }
+        .rv-info-label { color: var(--text-muted); font-weight: 700; min-width: 120px; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .rv-info-value { color: var(--text-dark); font-weight: 500; }
+
+        /* ── CANDIDATE SWITCHER ── */
+        .rv-switcher-bar {
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .rv-switcher-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .rv-cand-chip {
+            padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600;
+            background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+            cursor: pointer; transition: all 0.15s ease;
+        }
+        .rv-cand-chip:hover { background: #e0e7ff; color: var(--primary-blue); border-color: #c7d2fe; }
+        .rv-cand-chip.active { background: var(--primary-blue); color: #ffffff; border-color: var(--primary-blue); }
+
+        /* ── REDACTED FIELD ── */
+        .rv-redacted {
+            display: inline-block; background: #1e293b; color: #1e293b;
+            border-radius: 3px; user-select: none; font-size: 12px;
+            padding: 1px 6px; min-width: 80px;
+        }
+
+        /* ── PRINT BUTTON ── */
+        .rv-print-btn {
+            background: #f8fafc; border: 1px solid #cbd5e1; color: var(--primary-blue);
+            padding: 8px 18px; border-radius: 8px; font-size: 13px;
+            font-weight: 700; cursor: pointer; transition: all 0.15s ease;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .rv-print-btn:hover { background: #eff6ff; border-color: var(--primary-blue); }
+
+        @media print {
+            .sidebar, .rv-switcher-bar, .rv-print-btn, .header-actions button { display: none !important; }
+            .rv-privacy-badge { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sidebar-header"><h1 class="sidebar-brand">ElastiCrew</h1></div>
+        <ul class="nav-menu">
+            <li class="nav-menu-item"><a href="hiring-queue.html?v=3"><span>Hiring Queue</span></a></li>
+            <li class="nav-menu-item"><a href="resume-queue.html?v=3"><span>Resume Queue</span></a></li>
+            <li class="nav-menu-item"><a href="all-candidates.html?v=3"><span>All Candidates</span></a></li>
+            <li class="nav-menu-item active"><a href="resume-view.html"><span>View Resume</span></a></li>
+            <li class="nav-menu-item"><a href="assessments.html?v=3"><span>Assessments</span></a></li>
+            <li class="nav-menu-item"><a href="reports.html?v=3"><span>Reports</span></a></li>
+            <li class="nav-menu-item"><a href="dashboard.html?v=3"><span>Dashboard</span></a></li>
+            <li class="nav-menu-item"><a href="departments.html?v=3"><span>Departments</span></a></li>
+            <li class="nav-menu-item"><a href="settings.html?v=3"><span>Settings</span></a></li>
+        </ul>
+        <div class="logout-container"><a href="#" class="logout-link"><span>Logout</span></a></div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="header-actions">
+            <div>
+                <h1 class="page-title">Anonymized Resume View</h1>
+                <p style="color: var(--text-muted); font-size: 13.5px; margin-top: 6px;">
+                    Personal information is hidden. Only professional credentials and assessment data are displayed.
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="rv-print-btn" onclick="window.print()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Print / Export
+                </button>
+            </div>
+        </header>
+
+        <div class="rv-page-wrapper">
+
+            <!-- CANDIDATE SWITCHER -->
+            <div class="rv-switcher-bar">
+                <span class="rv-switcher-label">Select Profile:</span>
+                <div class="rv-cand-chip active" onclick="loadCandidate(0, this)">Candidate A</div>
+                <div class="rv-cand-chip" onclick="loadCandidate(1, this)">Candidate B</div>
+                <div class="rv-cand-chip" onclick="loadCandidate(2, this)">Candidate C</div>
+                <div class="rv-cand-chip" onclick="loadCandidate(3, this)">Candidate D</div>
+                <div class="rv-cand-chip" onclick="loadCandidate(4, this)">Candidate E</div>
+                <div class="rv-cand-chip" onclick="loadCandidate(5, this)">Candidate F</div>
+            </div>
+
+            <!-- IDENTITY BANNER (no personal info) -->
+            <div class="rv-identity-banner">
+                <div class="rv-identity-left">
+                    <div class="rv-anon-avatar" aria-label="Anonymized profile icon">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div class="rv-role-block">
+                        <h2 id="rv-role">Software Engineer</h2>
+                        <p id="rv-dept-line">Engineering &bull; Full Stack &bull; Senior (5+ Y)</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <span class="rv-pipeline-pill completed" id="rv-pipeline-pill">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span id="rv-stage-text">Tech Interview Completed</span>
+                    </span>
+                    <span class="rv-privacy-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        PII Redacted
+                    </span>
+                </div>
+            </div>
+
+            <!-- THREE-COLUMN GRID -->
+            <div class="rv-grid">
+
+                <!-- COLUMN 1: PROFESSIONAL PROFILE -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Role &amp; Department</div>
+                        <div class="rv-info-row">
+                            <span class="rv-info-label">Target Role</span>
+                            <span class="rv-info-value" id="c1-role">Software Engineer</span>
+                        </div>
+                        <div class="rv-info-row">
+                            <span class="rv-info-label">Department</span>
+                            <span class="rv-info-value" id="c1-dept">Engineering</span>
+                        </div>
+                        <div class="rv-info-row">
+                            <span class="rv-info-label">Sub-Department</span>
+                            <span class="rv-info-value" id="c1-subdept">Full Stack</span>
+                        </div>
+                        <div class="rv-info-row">
+                            <span class="rv-info-label">Experience Level</span>
+                            <span class="rv-info-value" id="c1-exp">Senior (5+ Y)</span>
+                        </div>
+                        <div class="rv-info-row">
+                            <span class="rv-info-label">Date Applied</span>
+                            <span class="rv-info-value" id="c1-date">2026-06-08</span>
+                        </div>
+                        <div class="rv-info-row">
+                            <span class="rv-info-label">Admin Status</span>
+                            <span class="rv-info-value" id="c1-status">Active</span>
+                        </div>
+                    </div>
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Tech Stack</div>
+                        <div class="rv-badge-list" id="c1-techstack"></div>
+                    </div>
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Resume Highlights</div>
+                        <ul class="rv-bullet-list" id="c1-highlights"></ul>
+                    </div>
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Education</div>
+                        <div id="c1-education" style="font-size:13px; color: var(--text-main); line-height: 1.5;"></div>
+                    </div>
+
+                </div>
+
+                <!-- COLUMN 2: WORK HISTORY + VIDEO SCREENING SCORES -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Work History</div>
+                        <div id="c1-workhistory"></div>
+                    </div>
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Video Screening — AI Behavioral Analysis</div>
+                        <div id="c1-screening-scores" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    </div>
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Video Screening — Q&amp;A Highlights</div>
+                        <div id="c1-qa-highlights" style="font-size: 12.5px; line-height: 1.6; color: var(--text-main);"></div>
+                    </div>
+
+                </div>
+
+                <!-- COLUMN 3: TECHNICAL EVALUATION -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Technical Interview — Evaluation Scores</div>
+                        <div id="c1-tech-scores" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    </div>
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Technical Interview — Key Observations</div>
+                        <ul class="rv-bullet-list" id="c1-tech-observations"></ul>
+                    </div>
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Code Submission Quality</div>
+                        <div id="c1-code-notes" style="font-size:12.5px; color: var(--text-main); line-height:1.5;"></div>
+                        <div class="rv-badge-list" id="c1-code-badges" style="margin-top: 8px;"></div>
+                    </div>
+
+                    <div class="rv-card">
+                        <div class="rv-card-title">Pipeline Stage Progression</div>
+                        <div id="c1-pipeline-stages" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div><!-- /.rv-page-wrapper -->
+    </main>
+
+    <script>
+    // ── CANDIDATE DATA STORE (no names, no emails, no phone, no photo) ──
+    const candidates = [
+        {
+            role: "Software Engineer",
+            dept: "Engineering",
+            subdept: "Full Stack",
+            exp: "Senior (5+ Y)",
+            date: "2026-06-08",
+            status: "Active",
+            stage: "Tech Interview Completed",
+            stageClass: "completed",
+            techStack: ["Python","Django","FastAPI","PostgreSQL","AWS","Docker","Redis","Celery"],
+            highlights: [
+                "Well-structured, modular document architecture across all submissions",
+                "Strong backend and distributed systems engineering depth",
+                "Relevant microservices and async pipeline background",
+                "Clear project ownership and system-level reasoning",
+                "Proficient in cloud infrastructure and containerized deployments"
+            ],
+            education: "<strong>B.S. Computer Science</strong><br>Major Research Focus: Distributed Systems &amp; Backend Architecture<br>Graduated: 2019",
+            workHistory: [
+                { title: "Senior Software Engineer", org: "Tech Solutions Inc.", period: "2021 – Present", body: "Architected async microservices pipelines processing concurrent request loads at scale. Led token whitelisting and MERN-stack security hardening across distributed deployments." },
+                { title: "Backend Engineer", org: "CloudBase Systems", period: "2019 – 2021", body: "Built REST and GraphQL API layers with Django and FastAPI. Managed PostgreSQL query optimization, reducing average response time by 40%." }
+            ],
+            screeningScores: [
+                { label: "Communication Clarity", value: 80 },
+                { label: "Confidence & Delivery", value: 85 },
+                { label: "Technical Vocabulary Match", value: 88 },
+                { label: "Problem Framing", value: 78 }
+            ],
+            qaHighlights: [
+                { q: "Microservices architecture experience?", a: "Built decoupled backend layers using Express and Django, separating operations into independent service layers with event-driven coordination." },
+                { q: "Handling CORS cross-origin configuration?", a: "Establishes a secure whitelisting array from deployment config files, dropping unauthorized endpoints at the middleware layer." }
+            ],
+            techScores: [
+                { label: "Core Engineering Depth", value: 92 },
+                { label: "Algorithmic Logic", value: 90 },
+                { label: "System Architecture Design", value: 88 },
+                { label: "Code Quality & Readability", value: 85 }
+            ],
+            techObservations: [
+                "Immediately identified hash map optimization for the traversal challenge",
+                "Explained Big-O trade-offs precisely without prompting",
+                "Clean separation of concerns in code submission",
+                "Proactively discussed edge cases and error handling paths"
+            ],
+            codeNotes: "Submitted an optimal two-sum implementation using hash map with O(n) time complexity. Code is concise, well-commented, and handles edge cases correctly.",
+            codeBadges: ["O(n) Complexity","Hash Map","Clean Code","Edge Cases Handled"],
+            codeBadgeClasses: ["rv-badge","rv-badge-green","rv-badge","rv-badge-green"],
+            pipelineStages: [
+                { label: "Video Bot Screening", done: true },
+                { label: "MCQ Assessment", done: true },
+                { label: "Technical Interview", done: true },
+                { label: "HR Interview", done: false }
+            ]
+        },
+        {
+            role: "Backend Engineer",
+            dept: "Engineering",
+            subdept: "Backend",
+            exp: "Junior (1-3 Y)",
+            date: "2026-06-01",
+            status: "Active",
+            stage: "Video Screening Pending",
+            stageClass: "pending",
+            techStack: ["Node.js","Express","MongoDB","REST APIs","Git","Jest"],
+            highlights: [
+                "Solid understanding of RESTful API design principles",
+                "Experience with NoSQL database modeling",
+                "Test-driven development background",
+                "Active open-source contributor on GitHub"
+            ],
+            education: "<strong>B.E. Information Technology</strong><br>Focus: Software Engineering &amp; Web Technologies<br>Graduated: 2023",
+            workHistory: [
+                { title: "Junior Backend Developer", org: "Startup Accelerator Co.", period: "2023 – Present", body: "Developed and maintained Node.js REST APIs serving mobile applications. Implemented JWT authentication and role-based access controls." }
+            ],
+            screeningScores: [
+                { label: "Communication Clarity", value: 72 },
+                { label: "Confidence & Delivery", value: 68 },
+                { label: "Technical Vocabulary Match", value: 74 },
+                { label: "Problem Framing", value: 70 }
+            ],
+            qaHighlights: [
+                { q: "How do you handle async operations in Node.js?", a: "Uses async/await with try-catch blocks and Promise.all for concurrent requests where possible." },
+                { q: "Describe your approach to API security.", a: "Implements input validation, rate limiting, and JWT token expiration with refresh token rotation." }
+            ],
+            techScores: [
+                { label: "Core Engineering Depth", value: 70 },
+                { label: "Algorithmic Logic", value: 68 },
+                { label: "System Architecture Design", value: 60 },
+                { label: "Code Quality & Readability", value: 75 }
+            ],
+            techObservations: [
+                "Good grasp of REST conventions and HTTP semantics",
+                "Needs more exposure to distributed system patterns",
+                "Code submission was functionally correct but lacked comments"
+            ],
+            codeNotes: "Submitted a working solution but used a brute-force O(n²) approach. Showed awareness of optimization when prompted.",
+            codeBadges: ["O(n²) Complexity","Functional","Needs Optimization"],
+            codeBadgeClasses: ["rv-badge-purple","rv-badge-green","rv-badge"],
+            pipelineStages: [
+                { label: "Video Bot Screening", done: false },
+                { label: "MCQ Assessment", done: false },
+                { label: "Technical Interview", done: false },
+                { label: "HR Interview", done: false }
+            ]
+        },
+        {
+            role: "Full Stack Engineer",
+            dept: "Engineering",
+            subdept: "Full Stack",
+            exp: "Mid Level (3-5 Y)",
+            date: "2026-05-28",
+            status: "Active",
+            stage: "Tech Interview Completed",
+            stageClass: "completed",
+            techStack: ["React","TypeScript","Node.js","GraphQL","PostgreSQL","Docker","Kubernetes"],
+            highlights: [
+                "Strong frontend + backend integration experience",
+                "Proficient in TypeScript and component-driven architecture",
+                "GraphQL schema design and resolver optimization",
+                "Containerized deployments with Docker and Kubernetes"
+            ],
+            education: "<strong>M.S. Computer Science</strong><br>Specialization: Software Systems<br>Graduated: 2021",
+            workHistory: [
+                { title: "Full Stack Engineer", org: "FinTech Platform Ltd.", period: "2021 – Present", body: "Built end-to-end financial reporting dashboards using React and Node.js, integrating real-time GraphQL subscriptions for live data feeds." },
+                { title: "Frontend Developer", org: "Agency Works", period: "2019 – 2021", body: "Delivered responsive web applications for 12+ enterprise clients using React and Redux, with strong accessibility compliance." }
+            ],
+            screeningScores: [
+                { label: "Communication Clarity", value: 88 },
+                { label: "Confidence & Delivery", value: 90 },
+                { label: "Technical Vocabulary Match", value: 87 },
+                { label: "Problem Framing", value: 85 }
+            ],
+            qaHighlights: [
+                { q: "State management approach in React?", a: "Prefers Zustand or React Query over Redux for most use cases — simpler API, less boilerplate, and excellent cache management." },
+                { q: "GraphQL vs REST trade-offs?", a: "GraphQL excels at reducing over-fetching and enabling client-driven queries, but REST is preferable for simple CRUD services with caching requirements." }
+            ],
+            techScores: [
+                { label: "Core Engineering Depth", value: 86 },
+                { label: "Algorithmic Logic", value: 82 },
+                { label: "System Architecture Design", value: 84 },
+                { label: "Code Quality & Readability", value: 91 }
+            ],
+            techObservations: [
+                "Excellent component architecture and separation of concerns",
+                "GraphQL resolver design showed strong API design knowledge",
+                "Code submission was clean, typed, and well-structured",
+                "Demonstrated awareness of performance trade-offs in rendering"
+            ],
+            codeNotes: "Submitted a well-typed TypeScript solution with proper error handling and clear naming conventions. Includes unit test stubs.",
+            codeBadges: ["TypeScript","O(n log n)","Unit Tests","Clean Code"],
+            codeBadgeClasses: ["rv-badge-purple","rv-badge","rv-badge-green","rv-badge-green"],
+            pipelineStages: [
+                { label: "Video Bot Screening", done: true },
+                { label: "MCQ Assessment", done: true },
+                { label: "Technical Interview", done: true },
+                { label: "HR Interview", done: false }
+            ]
+        },
+        {
+            role: "Frontend Engineer",
+            dept: "Engineering",
+            subdept: "Frontend",
+            exp: "Junior (1-3 Y)",
+            date: "2026-05-15",
+            status: "Rejected",
+            stage: "Video Screening Pending",
+            stageClass: "pending",
+            techStack: ["HTML","CSS","JavaScript","React","Figma","WCAG Accessibility"],
+            highlights: [
+                "Portfolio shows strong visual design sensibility",
+                "Accessibility-first development approach",
+                "Responsive design across multiple device breakpoints"
+            ],
+            education: "<strong>B.Des. Interaction Design</strong><br>Focus: Human-Computer Interaction<br>Graduated: 2024",
+            workHistory: [
+                { title: "Junior Frontend Developer (Intern)", org: "Design Studio X", period: "2023 – 2024", body: "Implemented pixel-perfect UI components from Figma designs using React. Contributed to the company's component library." }
+            ],
+            screeningScores: [
+                { label: "Communication Clarity", value: 65 },
+                { label: "Confidence & Delivery", value: 60 },
+                { label: "Technical Vocabulary Match", value: 58 },
+                { label: "Problem Framing", value: 55 }
+            ],
+            qaHighlights: [
+                { q: "How do you ensure accessibility compliance?", a: "Uses semantic HTML, ARIA labels, and keyboard navigation testing. References WCAG 2.1 guidelines during development." }
+            ],
+            techScores: [
+                { label: "Core Engineering Depth", value: 55 },
+                { label: "Algorithmic Logic", value: 50 },
+                { label: "System Architecture Design", value: 45 },
+                { label: "Code Quality & Readability", value: 65 }
+            ],
+            techObservations: [
+                "Strong UI skills but limited backend understanding",
+                "Struggled with algorithmic questions beyond basic array operations",
+                "Code submission lacked error handling"
+            ],
+            codeNotes: "Solution was partially complete. Correct approach identified but implementation had logic errors under edge cases.",
+            codeBadges: ["Partial Solution","Needs Improvement"],
+            codeBadgeClasses: ["rv-badge-purple","rv-badge"],
+            pipelineStages: [
+                { label: "Video Bot Screening", done: false },
+                { label: "MCQ Assessment", done: false },
+                { label: "Technical Interview", done: false },
+                { label: "HR Interview", done: false }
+            ]
+        },
+        {
+            role: "Account Executive",
+            dept: "Sales",
+            subdept: "Account Executive",
+            exp: "Senior (5+ Y)",
+            date: "2026-06-05",
+            status: "Active",
+            stage: "Tech Interview Pending",
+            stageClass: "pending",
+            techStack: ["Salesforce CRM","HubSpot","Excel","Tableau","Outreach.io","LinkedIn Sales Navigator"],
+            highlights: [
+                "Consistent top-10% quota attainment across 4 consecutive years",
+                "Experience closing enterprise SaaS deals $250K–$1.5M ARR",
+                "Strong pipeline forecasting and CRM hygiene disciplines",
+                "Track record of shortening sales cycles through discovery excellence"
+            ],
+            education: "<strong>B.B.A. Marketing &amp; Sales</strong><br>Focus: B2B Sales Strategy<br>Graduated: 2017",
+            workHistory: [
+                { title: "Senior Account Executive", org: "SaaS Enterprise Corp.", period: "2020 – Present", body: "Managed a $4.2M book of business. Consistently exceeded quarterly quotas by 115–130%. Led discovery-to-close cycles for Fortune 500 accounts." },
+                { title: "Account Executive", org: "Mid-Market Software Co.", period: "2017 – 2020", body: "Built outbound pipeline from scratch in a new territory, ramping to 140% of quota by Q3 of year one." }
+            ],
+            screeningScores: [
+                { label: "Communication Clarity", value: 95 },
+                { label: "Confidence & Delivery", value: 93 },
+                { label: "Technical Vocabulary Match", value: 78 },
+                { label: "Problem Framing", value: 88 }
+            ],
+            qaHighlights: [
+                { q: "How do you approach a stalled enterprise deal?", a: "Re-qualifies the business case, resurfaces executive-level pain, and introduces a multi-threading strategy to expand internal champions." },
+                { q: "Describe your pipeline management approach.", a: "Uses deal health scores in Salesforce with weekly forecast calls, maintaining a 4x pipeline coverage ratio for quarterly predictability." }
+            ],
+            techScores: [
+                { label: "Domain Knowledge", value: 90 },
+                { label: "Objection Handling", value: 92 },
+                { label: "Strategic Thinking", value: 85 },
+                { label: "Process Discipline", value: 88 }
+            ],
+            techObservations: [
+                "Exceptional articulation of discovery methodology and MEDDIC framework",
+                "Demonstrated strong executive presence and executive-level communication",
+                "Clear understanding of competitive landscape and differentiation narratives"
+            ],
+            codeNotes: "Role does not require code submission. Competency assessment conducted via case study presentation.",
+            codeBadges: ["Case Study: Pass","Executive Presence: Strong","Domain Expert"],
+            codeBadgeClasses: ["rv-badge-green","rv-badge-green","rv-badge"],
+            pipelineStages: [
+                { label: "Video Bot Screening", done: true },
+                { label: "MCQ Assessment", done: false },
+                { label: "Technical Interview", done: false },
+                { label: "HR Interview", done: false }
+            ]
+        },
+        {
+            role: "Systems Engineer",
+            dept: "Engineering",
+            subdept: "Systems Eng",
+            exp: "Mid Level (3-5 Y)",
+            date: "2026-06-05",
+            status: "Active",
+            stage: "Video Screening Pending",
+            stageClass: "pending",
+            techStack: ["C++","Python","Linux","Embedded Systems","RTOS","TCP/IP","Bash","CMake"],
+            highlights: [
+                "Deep experience in low-level systems and embedded programming",
+                "Strong kernel and driver development background",
+                "Proficient in real-time operating system design patterns",
+                "Familiarity with hardware-software co-design methodologies"
+            ],
+            education: "<strong>B.S. Electrical &amp; Computer Engineering</strong><br>Focus: Embedded Systems &amp; Computer Architecture<br>Graduated: 2020",
+            workHistory: [
+                { title: "Systems Engineer", org: "Aerospace Components Ltd.", period: "2020 – Present", body: "Developed flight control software modules in C++ on an RTOS platform. Collaborated with hardware teams on sensor integration and real-time data acquisition pipelines." }
+            ],
+            screeningScores: [
+                { label: "Communication Clarity", value: 76 },
+                { label: "Confidence & Delivery", value: 80 },
+                { label: "Technical Vocabulary Match", value: 84 },
+                { label: "Problem Framing", value: 79 }
+            ],
+            qaHighlights: [
+                { q: "How do you manage memory in resource-constrained environments?", a: "Uses static allocation and memory pools to avoid heap fragmentation. Profiles stack usage with boundary sentinel values." },
+                { q: "Describe your approach to real-time task scheduling.", a: "Applies rate-monotonic scheduling for periodic tasks and uses priority inversion prevention via priority inheritance in the RTOS." }
+            ],
+            techScores: [
+                { label: "Core Engineering Depth", value: 88 },
+                { label: "Algorithmic Logic", value: 83 },
+                { label: "System Architecture Design", value: 87 },
+                { label: "Code Quality & Readability", value: 80 }
+            ],
+            techObservations: [
+                "Strong mental model of execution at the hardware-software boundary",
+                "Correctly identified race condition in the concurrency question",
+                "Code submission showed disciplined use of const-correctness and RAII",
+                "Could benefit from broader exposure to cloud-native patterns"
+            ],
+            codeNotes: "Submitted a clean, idiomatic C++ solution demonstrating RAII principles and careful resource management. Memory safety was a clear priority.",
+            codeBadges: ["RAII Pattern","Const-Correct","Memory Safe","C++17"],
+            codeBadgeClasses: ["rv-badge-green","rv-badge-green","rv-badge-green","rv-badge-purple"],
+            pipelineStages: [
+                { label: "Video Bot Screening", done: false },
+                { label: "MCQ Assessment", done: false },
+                { label: "Technical Interview", done: false },
+                { label: "HR Interview", done: false }
+            ]
+        }
+    ];
+
+    // ── RENDER HELPERS ──
+    function scoreRowHTML(item) {
+        return `
+        <div class="rv-score-row">
+            <span class="rv-score-label">${item.label}</span>
+            <div class="rv-score-bar-track">
+                <div class="rv-score-bar-fill" style="width:${item.value}%"></div>
+            </div>
+            <span class="rv-score-value">${item.value}%</span>
+        </div>`;
+    }
+
+    function pipelineStageHTML(stage) {
+        const icon = stage.done
+            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+            : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>`;
+        const style = stage.done
+            ? 'background:#dcfce7; color:#15803d; border:1px solid #bbf7d0;'
+            : 'background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0;';
+        return `<div style="display:flex; align-items:center; gap:8px; padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:600; ${style}">
+            ${icon} ${stage.label}
+        </div>`;
+    }
+
+    function qaBlockHTML(item) {
+        return `<div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
+            <div style="font-weight:700; color:#1e3a8a; font-size:12px; margin-bottom:4px;">${item.q}</div>
+            <div style="padding-left:10px; border-left:2px solid #e2e8f0; font-size:12px; color:#334155; line-height:1.5;">${item.a}</div>
+        </div>`;
+    }
+
+    // ── MAIN LOAD FUNCTION ──
+    function loadCandidate(index, chipEl) {
+        const c = candidates[index];
+
+        // Update switcher chips
+        document.querySelectorAll('.rv-cand-chip').forEach(el => el.classList.remove('active'));
+        if (chipEl) chipEl.classList.add('active');
+
+        // Identity banner
+        document.getElementById('rv-role').textContent = c.role;
+        document.getElementById('rv-dept-line').textContent = `${c.dept} \u2022 ${c.subdept} \u2022 ${c.exp}`;
+
+        const pill = document.getElementById('rv-pipeline-pill');
+        pill.className = `rv-pipeline-pill ${c.stageClass}`;
+        document.getElementById('rv-stage-text').textContent = c.stage;
+
+        // Column 1
+        document.getElementById('c1-role').textContent = c.role;
+        document.getElementById('c1-dept').textContent = c.dept;
+        document.getElementById('c1-subdept').textContent = c.subdept;
+        document.getElementById('c1-exp').textContent = c.exp;
+        document.getElementById('c1-date').textContent = c.date;
+        document.getElementById('c1-status').textContent = c.status;
+
+        document.getElementById('c1-techstack').innerHTML = c.techStack
+            .map(t => `<span class="rv-badge">${t}</span>`).join('');
+
+        document.getElementById('c1-highlights').innerHTML = c.highlights
+            .map(h => `<li>${h}</li>`).join('');
+
+        document.getElementById('c1-education').innerHTML = c.education;
+
+        // Column 2: Work History
+        document.getElementById('c1-workhistory').innerHTML = c.workHistory.map(w => `
+            <div class="rv-timeline-entry">
+                <div class="rv-entry-title">${w.title}</div>
+                <div class="rv-entry-org">${w.org}</div>
+                <div class="rv-entry-period">${w.period}</div>
+                <div class="rv-entry-body">${w.body}</div>
+            </div>`).join('');
+
+        document.getElementById('c1-screening-scores').innerHTML =
+            c.screeningScores.map(scoreRowHTML).join('');
+
+        document.getElementById('c1-qa-highlights').innerHTML =
+            c.qaHighlights.map(qaBlockHTML).join('');
+
+        // Column 3: Technical
+        document.getElementById('c1-tech-scores').innerHTML =
+            c.techScores.map(scoreRowHTML).join('');
+
+        document.getElementById('c1-tech-observations').innerHTML =
+            c.techObservations.map(o => `<li>${o}</li>`).join('');
+
+        document.getElementById('c1-code-notes').innerHTML = c.codeNotes;
+        document.getElementById('c1-code-badges').innerHTML = c.codeBadges
+            .map((b, i) => `<span class="${c.codeBadgeClasses[i]}">${b}</span>`).join('');
+
+        document.getElementById('c1-pipeline-stages').innerHTML =
+            c.pipelineStages.map(pipelineStageHTML).join('');
+    }
+
+    // Boot with first candidate
+    loadCandidate(0, document.querySelector('.rv-cand-chip.active'));
+    </script>
+</body>
+</html>

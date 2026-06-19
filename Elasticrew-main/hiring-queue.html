@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticrew - Video Bot Screening</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- HIGH GRAPHIC VERTICAL GRID ALIGNMENT OVERRIDES --- */
+        .grid-layout-th,
+        .grid-layout-td {
+            padding: 14px 16px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        /* Strict column width constraints to enforce perfect vertical lines */
+        .col-name {
+            width: 18%;
+        }
+
+        .col-dept {
+            width: 14%;
+        }
+
+        .col-invited {
+            width: 12%;
+        }
+
+        .col-completed {
+            width: 12%;
+        }
+
+        .col-status {
+            width: 16%;
+        }
+
+        .col-action {
+            width: 14%;
+            text-align: left;
+        }
+
+        .col-remarks {
+            width: 14%;
+            text-align: right;
+        }
+
+        .candidate-table td strong {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 170px;
+        }
+
+        .timestamp-txt {
+            font-family: monospace;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* --- STAGE TAG CORRECTION FOR COULD NOT COMPLETE --- */
+        .stage-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 12px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .stage-tag.screening {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        .stage-tag.offered {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .stage-tag.rejected {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .stage-tag.cancelled {
+            background-color: #ffedd5;
+            color: #c2410c;
+        }
+
+        /* Crisp orange layout fix for clear tracking bounds */
+
+        /* --- IMMUTABLE STABLE ASPECT-RATIO VIDEO VIEWPORT --- */
+        .locked-video-viewport {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000000;
+            border-radius: 6px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* --- UI RESOLVED CAPTIVE MODAL BACKDROPS --- */
+        .recording-popup-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+
+        .recording-popup-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Constrained structural grid covering exactly 60% of viewport area cleanly */
+        .premium-60-modal {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 60vw !important;
+            height: 60vh !important;
+            min-width: 820px;
+            max-width: 95%;
+            max-height: 90vh;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+        }
+
+        .modal-left-media {
+            background: #0f141c;
+            display: flex;
+            flex-direction: column;
+            padding: 18px;
+            box-sizing: border-box;
+            justify-content: space-between;
+        }
+
+        .modal-right-data {
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            min-width: 0;
+            border-left: 1px solid #e2e8f0;
+            box-sizing: border-box;
+        }
+
+        /* Compact Horizontal Navigation Buttons */
+        .modal-q-nav-strip {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            margin-top: 14px;
+            flex-shrink: 0;
+        }
+
+        .modal-q-node {
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            padding: 6px 0;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .modal-q-node:hover {
+            background: #334155;
+            color: #fff;
+        }
+
+        .modal-q-node.active-q {
+            background: #7c3aed;
+            color: #fff;
+            border-color: #6d28d9;
+        }
+
+        .box-scroll-transcript {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 12px;
+            font-size: 12.5px;
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+
+        /* --- CONSTRAINED ADMINISTRATIVE REMARKS POPUP MODAL --- */
+        .remarks-popup-card {
+            max-width: 460px;
+            width: 90%;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .remarks-textarea-modal {
+            width: 100%;
+            height: 130px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 13px;
+            color: #1e293b;
+            resize: none;
+            background: #f8fafc;
+            box-sizing: border-box;
+            font-family: inherit;
+            margin-bottom: 14px;
+            transition: all 0.12s ease;
+        }
+
+        .remarks-textarea-modal:focus {
+            background: #ffffff;
+            border-color: #2563eb;
+            outline: none;
+        }
+
+        .checkbox-dropdown-panel {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 8px 12px;
+            background-color: #ffffff;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 13px;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .dropdown-wrapper:hover .dropdown-menu {
+            display: block !important;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f1f5f9;
+        }
+    </style>
+
+    <style>
+        .enterprise-table td strong {
+            white-space: normal !important;
+            max-width: none !important;
+            line-height: 1.3;
+        }
+
+        .enterprise-table td {
+            vertical-align: middle !important;
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
+        }
+
+        .enterprise-table th:first-child,
+        .enterprise-table td:first-child {
+            padding-left: 24px !important;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR MENU -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-brand">ElastiCrew</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-menu-item active"><a href="/hiring-queue.html"><span>Hiring Queue</span></a></li>
+            <li class="nav-menu-item"><a href="/"><span>All Candidates</span></a></li>
+            <li class="nav-menu-item"><a href="/assessments.html"><span>Assessments</span></a></li>
+            <li class="nav-menu-item"><a href="/reports.html"><span>Reports</span></a></li>
+            <li class="nav-menu-item"><a href="/dashboard.html"><span>Dashboard</span></a></li>
+            <li class="nav-menu-item"><a href="/departments.html"><span>Departments</span></a></li>
+            <li class="nav-menu-item"><a href="/settings.html"><span>Settings</span></a></li>
+        </ul>
+        <div class="logout-container"><a href="#" class="logout-link"><span>Logout</span></a></div>
+    </nav>
+
+    <!-- MAIN FRAME CONTENT AREA -->
+    <main class="main-content" style="padding: 24px 40px !important;">
+        <div
+            style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.8px;">
+            Pipeline Stages</div>
+                                <style>
+            .pipeline-stepper {
+                display: flex;
+                align-items: center;
+                margin-bottom: 30px;
+                background: #ffffff;
+                padding: 16px 20px;
+                border-radius: 24px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+                border: 1px solid #f1f5f9;
+                justify-content: space-between;
+                position: relative;
+            }
+            .pipeline-step {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 24px;
+                border-radius: 30px;
+                background: #f8fafc;
+                color: #64748b;
+                font-weight: 600;
+                font-size: 14px;
+                text-decoration: none;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid transparent;
+                position: relative;
+                z-index: 2;
+            }
+            
+            .pipeline-step svg {
+                color: #94a3b8;
+                transition: all 0.4s ease;
+            }
+            
+
+
+            
+            .pipeline-step.active {
+                background: var(--primary-blue) !important;
+                color: #ffffff !important;
+                box-shadow: 0 6px 16px rgba(14, 45, 123, 0.3);
+                
+            }
+            .pipeline-step.active svg {
+                color: #ffffff !important;
+            }
+            
+            .pipeline-step:not(.active):hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            }
+            
+            .step-connector {
+                flex: 1;
+                height: 4px;
+                background: #e2e8f0;
+                margin: 0 -15px;
+                z-index: 1;
+                border-radius: 2px;
+                transition: all 0.4s ease;
+            }
+
+            /* Add Candidate — matches active pipeline-step style exactly */
+            .pipeline-step--add-candidate {
+                background: var(--primary-blue) !important;
+                color: #ffffff !important;
+                border: 1px solid transparent !important;
+                box-shadow: 0 6px 16px rgba(14, 45, 123, 0.3) !important;
+            }
+            .pipeline-step--add-candidate svg {
+                color: #ffffff !important;
+            }
+            .pipeline-step--add-candidate:hover {
+                background: #081a4a !important;
+                box-shadow: 0 8px 20px rgba(14, 45, 123, 0.45) !important;
+                transform: translateY(-2px);
+            }
+
+
+        </style>
+        <div class="pipeline-stepper">
+            <!-- Step 0: Add Candidate -->
+            <a href="/" class="pipeline-step pipeline-step--add-candidate">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <line x1="19" y1="8" x2="19" y2="14"></line>
+                    <line x1="16" y1="11" x2="22" y2="11"></line>
+                </svg>
+                <span>Add Candidate</span>
+            </a>
+            <div class="step-connector"></div>
+            <!-- Step 1 -->
+            <a href="/hiring-queue.html" class="pipeline-step active">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 7l-7 5 7 5V7z"></path>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+                <span>Video Bot Screening</span>
+            </a>
+            <div class="step-connector "></div>
+            <!-- Step 2 -->
+            <a href="#" class="pipeline-step ">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                </svg>
+                <span>MCQ Assessment</span>
+            </a>
+            <div class="step-connector "></div>
+            <!-- Step 3 -->
+            <a href="/tech-scheduler.html" class="pipeline-step ">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                </svg>
+                <span>Tech Scheduler</span>
+            </a>
+            <div class="step-connector "></div>
+            <!-- Step 4 -->
+            <a href="#" class="pipeline-step ">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>HR Interview</span>
+            </a>
+        </div>
+
+        <header class="header-actions" style="margin-bottom: 16px;">
+            <div>
+                <h1 class="page-title">Video Screening Operations Workspace</h1>
+                <p style="color: #64748b; font-size: 14px; margin-top: 6px;">Review candidate screening results and move
+                    qualified candidates forward.</p>
+            </div>
+            <div style="display:flex; align-items:center;">
+
+            </div>
+        </header>
+
+        <!-- Action-Oriented KPI Panel -->
+        <section class="kpi-panel-container" style="margin-bottom: 20px;">
+            <div class="kpi-card warning">
+                <div class="kpi-label">Invite Pending</div>
+                <div class="kpi-count">1</div>
+            </div>
+            <div class="kpi-card danger">
+                <div class="kpi-label">Screening Expired</div>
+                <div class="kpi-count">1</div>
+            </div>
+
+            <div class="kpi-card neutral">
+                <div class="kpi-label">Invite Sent</div>
+                <div class="kpi-count">1</div>
+            </div>
+            <div class="kpi-card orange">
+                <div class="kpi-label">Screening Abandoned</div>
+                <div class="kpi-count">1</div>
+            </div>
+            <div class="kpi-card teal">
+                <div class="kpi-label">Awaiting Review</div>
+                <div class="kpi-count">2</div>
+            </div>
+            <div class="kpi-card neutral" style="border-left-color: #64748b;">
+                <div class="kpi-label">On Hold</div>
+                <div class="kpi-count">0</div>
+            </div>
+        </section>
+
+        <!-- Pipeline Stages Label -->
+
+
+
+
+        <!-- Enterprise Data Grid -->
+        <section class="candidates-section">
+
+            <div style="margin-top: 30px; margin-bottom: 12px; padding-left: 24px;">
+                <h2
+                    style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">
+                    Screening Pending Queue <span
+                        style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">4</span>
+                </h2>
+                <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates Pending Video
+                    Bot Screening</p>
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="candidate-table enterprise-table" style="width: 100%;">
+
+                    <thead>
+                        <tr>
+                            <th style="width: 10%; white-space: nowrap; ">Candidate_ID</th>
+                            <th style="width: 20%; white-space: nowrap;">Name</th>
+                            <th style="width: 15%; white-space: nowrap;">Sub Dept.</th>
+                            <th style="width: 12%; white-space: nowrap; ">Invite Date</th>
+                            <th style="width: 15%; white-space: nowrap; ">Candidate Status</th>
+                            <th style="width: 10%; white-space: nowrap; text-align: center; ">HR Notes</th>
+                            <th style="width: 18%; white-space: nowrap; text-align: right; ">Actions</th>
+                        </tr>
+                    </thead>
+                    <!-- Row 1 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1042</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Alan Turing</strong></div>
+                                </div>
+                            </td>
+                            <td>Backend Eng</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">-</div>
+                            </td>
+                            <td><span class="status-badge"
+                                    style="background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Invite
+                                    Pending</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Alan Turing', this)"
+                                    style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td style="text-align: right; ">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <select class="filter-select"
+                                        style=" padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="remind">Send Reminder</option>
+                                        <option value="reshare">Extend & Reshare Invite</option>
+                                        <option value="cancel">Cancel Invitation</option>
+                                        <option value="bypass">Skip Screening Stage</option>
+                                        <option value="withdraw">Mark as Withdrawn</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Row 2 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1045</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Ada Lovelace</strong></div>
+                                </div>
+                            </td>
+                            <td>Frontend Eng</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">02 Jun 2026</div>
+                            </td>
+                            <td><span class="status-badge"
+                                    style="background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Screening
+                                    Expired</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Ada Lovelace', this)"
+                                    style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td style="text-align: right; ">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <select class="filter-select"
+                                        style=" padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="remind">Send Reminder</option>
+                                        <option value="reshare">Extend & Reshare Invite</option>
+                                        <option value="cancel">Cancel Invitation</option>
+                                        <option value="bypass">Skip Screening Stage</option>
+                                        <option value="withdraw">Mark as Withdrawn</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Row 3 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1048</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Margaret Hamilton</strong></div>
+                                </div>
+                            </td>
+                            <td>Systems Eng</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">11 Jun 2026</div>
+                            </td>
+                            <td><span class="status-badge"
+                                    style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Invite
+                                    Sent</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Margaret Hamilton', this)"
+                                    style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td style="text-align: right; ">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <select class="filter-select"
+                                        style=" padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="remind">Send Reminder</option>
+                                        <option value="reshare">Extend & Reshare Invite</option>
+                                        <option value="cancel">Cancel Invitation</option>
+                                        <option value="bypass">Skip Screening Stage</option>
+                                        <option value="withdraw">Mark as Withdrawn</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Row 4 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1051</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>John von Neumann</strong></div>
+                                </div>
+                            </td>
+                            <td>Data Science</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">09 Jun 2026</div>
+                            </td>
+                            <td><span class="status-badge"
+                                    style="background: #ffedd5; color: #c2410c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Screening
+                                    Abandoned</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('John von Neumann', this)"
+                                    style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td style="text-align: right; ">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <select class="filter-select"
+                                        style=" padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="remind">Send Reminder</option>
+                                        <option value="reshare">Extend & Reshare Invite</option>
+                                        <option value="cancel">Cancel Invitation</option>
+                                        <option value="bypass">Skip Screening Stage</option>
+                                        <option value="withdraw">Mark as Withdrawn</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 40px; margin-bottom: 12px; padding-left: 24px;">
+                <h2
+                    style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">
+                    Screening Completed Queue <span
+                        style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">3</span>
+                </h2>
+                <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates who have been
+                    Complete Video Bot Screening but Pending reviewed, rejected, or placed on hold.</p>
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="candidate-table enterprise-table" style="width: 100%;">
+
+                    <thead>
+                        <tr>
+                            <th style="width: 8%; white-space: nowrap; ">CANDIDATE_ID</th>
+                            <th style="width: 15%; white-space: nowrap;">NAME</th>
+                            <th style="width: 12%; white-space: nowrap;">SUB DEPT.</th>
+                            <th style="width: 10%; white-space: nowrap; ">INVITE DATE</th>
+                            <th style="width: 10%; white-space: nowrap; ">SUBMITTED ON</th>
+                            <th style="width: 12%; white-space: nowrap; ">HR Review Status</th>
+                            <th style="width: 10%; white-space: nowrap; text-align: center; ">VIEW SCREENING</th>
+                            <th style="width: 8%; white-space: nowrap; text-align: center; ">HR NOTES</th>
+                            <th style="width: 15%; white-space: nowrap; text-align: right; ">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <!-- Row 1 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1021</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Grace Hopper</strong></div>
+                                </div>
+                            </td>
+                            <td>Engineering</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">01 Jun 2026</div>
+                            </td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">03 Jun 2026</div>
+                            </td>
+                            <td><span class="status-badge"
+                                    style="background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Awaiting
+                                    Review</span></td>
+                            <td style="text-align: center;">
+                                <button class="btn-primary-action"
+                                    style="padding: 6px 12px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue);">View
+                                    Screening</button>
+                            </td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Grace Hopper', this)"
+                                    style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td style="text-align: right; ">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <select class="filter-select"
+                                        style=" padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="mcq">Ready For Assessment</option>
+                                        <option value="tech">Ready For Technical Interview</option>
+                                        <option value="hr">Ready For HR Interview</option>
+                                        <option value="hold">On Hold</option>
+                                        <option value="reject">Reject</option>
+                                        <option value="complete">Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Row 2 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1025</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Charles Babbage</strong></div>
+                                </div>
+                            </td>
+                            <td>Hardware</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">28 May 2026</div>
+                            </td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">30 May 2026</div>
+                            </td>
+                            <td><span class="status-badge"
+                                    style="background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Review
+                                    Completed</span></td>
+                            <td style="text-align: center;">
+                                <button class="btn-primary-action"
+                                    style="padding: 6px 12px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue);">View
+                                    Screening</button>
+                            </td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Charles Babbage', this)"
+                                    style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td style="text-align: right; ">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <select class="filter-select"
+                                        style=" padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="mcq">Ready For Assessment</option>
+                                        <option value="tech">Ready For Technical Interview</option>
+                                        <option value="hr">Ready For HR Interview</option>
+                                        <option value="hold">On Hold</option>
+                                        <option value="reject">Reject</option>
+                                        <option value="complete">Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Row 3 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1029</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Linus Torvalds</strong></div>
+                                </div>
+                            </td>
+                            <td>Product</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">25 May 2026</div>
+                            </td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">25 May 2026</div>
+                            </td>
+                            <td><span class="status-badge"
+                                    style="background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Awaiting
+                                    Review</span></td>
+                            <td style="text-align: center;">
+                                <button class="btn-primary-action"
+                                    style="padding: 6px 12px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue);">View
+                                    Screening</button>
+                            </td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Linus Torvalds', this)"
+                                    style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                            <td style="text-align: right; ">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <select class="filter-select"
+                                        style=" padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="mcq">Ready For Assessment</option>
+                                        <option value="tech">Ready For Technical Interview</option>
+                                        <option value="hr">Ready For HR Interview</option>
+                                        <option value="hold">On Hold</option>
+                                        <option value="reject">Reject</option>
+                                        <option value="complete">Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- --- INVITE RESHARE OVERLAY MODAL --- -->
+    <div class="modal-overlay" id="emailModalOverlay">
+        <div class="modal-card email-modal-card" style="max-width:460px; width:90%;">
+            <h2 class="modal-header" style="font-size:16px;">Reshare Video Screening Link</h2>
+            <form id="emailInviteForm">
+                <div class="form-group">
+                    <label>Sender</label>
+                    <input type="email" class="form-control" value="hr@elasticrew.com" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Candidate Email</label>
+                    <input type="email" id="candidateEmail" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="emailSubject" class="form-control"
+                        value="New Invitation: Complete your Video Screening with ElastiCrew" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Message Body</label>
+                    <textarea id="emailBody" class="form-control textarea-body" rows="5" style="resize:none;"
+                        required></textarea>
+                </div>
+                <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button type="button" class="btn-secondary" id="closeEmailModalBtn"
+                        style="padding:6px 12px; font-size:12px;">Cancel</button>
+                    <button type="submit" class="btn-submit dispatch-btn"
+                        style="padding:6px 12px; font-size:12px;">Reshare Link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- --- CONSTRAINED WORKSPACE TERMINAL BACKDROP (60% VIEWPORT COVERAGE) --- -->
+    <div class="recording-popup-backdrop" id="recordingPlayerModal"
+        onclick="closePopupOnBackdrop(event, 'recordingPlayerModal')">
+        <div class="premium-60-modal">
+
+            <!-- Left Side Panel: Media Box Streaming -->
+            <div class="modal-left-media">
+                <div style="flex-grow:1; display:flex; align-items:center; justify-content:center; min-height:0;">
+                    <video id="modalMainVideoBox" controls class="locked-video-viewport">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    </video>
+                </div>
+
+                <!-- Flat Numeric Question Navigation Strip -->
+                <div class="modal-q-nav-strip">
+                    <div class="modal-q-node active-q"
+                        onclick="jumpToTargetQuestionIndex(1, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q1</div>
+                    <div class="modal-q-node"
+                        onclick="jumpToTargetQuestionIndex(2, 'https://www.w3schools.com/html/movie.mp4')">Q2</div>
+                    <div class="modal-q-node"
+                        onclick="jumpToTargetQuestionIndex(3, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q3</div>
+                    <div class="modal-q-node"
+                        onclick="jumpToTargetQuestionIndex(4, 'https://www.w3schools.com/html/movie.mp4')">Q4</div>
+                    <div class="modal-q-node"
+                        onclick="jumpToTargetQuestionIndex(5, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q5</div>
+                    <div class="modal-q-node"
+                        onclick="jumpToTargetQuestionIndex(6, 'https://www.w3schools.com/html/movie.mp4')">Q6</div>
+                    <div class="modal-q-node"
+                        onclick="jumpToTargetQuestionIndex(7, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q7</div>
+                    <div class="modal-q-node"
+                        onclick="jumpToTargetQuestionIndex(8, 'https://www.w3schools.com/html/movie.mp4')">Q8</div>
+                </div>
+            </div>
+
+            <!-- Right Side Panel: Text Sync Transcript Logs -->
+            <div class="modal-right-data">
+                <div class="flex-between" style="border-bottom:1px solid #e2e8f0; padding-bottom:8px; flex-shrink:0;">
+                    <div>
+                        <h3 id="modalCandidateLabel" style="font-size:14px; font-weight:800; color:#0f172a; margin:0;">
+                            Grace Hopper</h3>
+                        <p id="modalActiveQuestionLabel"
+                            style="font-size:11px; color:#64748b; margin:2px 0 0 0; font-weight:600;">Question 1 Active
+                        </p>
+                    </div>
+                    <button
+                        style="background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8; line-height:1;"
+                        onclick="toggleRecordingModal()">&times;</button>
+                </div>
+
+                <div class="box-scroll-transcript" id="modalTranscriptBox">
+                    <p
+                        style="margin:0 0 6px 0; color:#1e3a8a; font-weight:700; font-size:11.5px; text-transform:uppercase;">
+                        Question Prompt:</p>
+                    <p id="modalQuestionTextElement" style="font-style:italic; margin:0 0 14px 0; color:#475569;">"Walk
+                        us through your experience building decoupled microservices architectures..."</p>
+                    <hr style="border:none; border-top:1px solid #f1f5f9; margin-bottom:12px;">
+                    <p
+                        style="margin:0 0 6px 0; color:#10b981; font-weight:700; font-size:11.5px; text-transform:uppercase;">
+                        Response Transcript:</p>
+                    <p id="modalAnswerTextElement" style="color:#1e293b; margin:0;">"I leverage decoupled container
+                        configurations routed natively over proxy handlers to distribute cross-origin data loads
+                        securely without bottleneck lags..."</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- --- POPUP OVERLAY C: CONSTRAINED ADMINISTRATIVE REMARKS MODAL LAYER --- -->
+    <div class="recording-popup-backdrop" id="remarksModalOverlay"
+        onclick="closePopupOnBackdrop(event, 'remarksModalOverlay')">
+        <div class="modal-card remarks-popup-card">
+            <div class="flex-between"
+                style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin:0;" id="remarksModalHeaderTitle">
+                    Administrative Remarks</h3>
+                <button
+                    style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height:1;"
+                    onclick="closeRemarksModal()">&times;</button>
+            </div>
+
+            <textarea id="modalRemarksTextarea" class="remarks-textarea-modal"
+                placeholder="Type diagnostic notes or screening feedback here..."></textarea>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="btn-secondary" style="padding:6px 12px; font-size:12px;"
+                    onclick="closeRemarksModal()">Cancel</button>
+                <button class="btn-submit"
+                    style="background-color: var(--primary-blue); padding:6px 12px; font-size:12px;"
+                    onclick="saveRemarksModalPayload()">Save & Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CODE INTERACTION ENGINE LOGIC -->
+    <script>
+        const qaScriptMatrix = {
+            1: { q: "Walk us through your experience building decoupled microservices architectures?", a: "I leverage decoupled container configurations routed natively over proxy handlers to distribute cross-origin data loads securely without bottleneck lags..." },
+            2: { q: "How do you secure connection token pipelines against routing exceptions?", a: "Routines drop payload queries instantly if state lookups discover missing signature maps inside header strings." },
+            3: { q: "Describe your approach to standard database execution analysis queries.", a: "Isolating operations using explain-analyze allows our modules to deploy targeted indexes where traversal paths spike." },
+            4: { q: "How do you manage cross-origin resource whitelisting structures securely?", a: "Whitelists are externalized out of core source images and evaluated sequentially during middleware validation sweeps." },
+            5: { q: "What logging steps do you enforce when tracking API error cascades?", a: "Routines emit structured trace tokens straight to independent error log aggregators for automated diagnostic auditing." },
+            6: { q: "Explain your container multi-stage layout assembly rules.", a: "Separating compile dependencies from final binaries ensures deployment targets stay light and strip down runtime security footprints." },
+            7: { q: "How do you optimize static rows handling inside web layers?", a: "Enforcing distributed memory cache rings allows servers to fetch asset data indices within constant time boundaries." },
+            8: { q: "How do you validate logic structures across microservices connections?", a: "We run end-to-end integration queries using mock target payloads before committing modifications back to staging." }
+        };
+
+        const candidateListBody = document.getElementById('candidateListBody');
+        const totalCountBubble = document.getElementById('totalCountBubble');
+        const noResults = document.getElementById('noResults');
+
+        const emailModalOverlay = document.getElementById('emailModalOverlay');
+        const closeEmailModalBtn = document.getElementById('closeEmailModalBtn');
+        const emailInviteForm = document.getElementById('emailInviteForm');
+        const candidateEmailInput = document.getElementById('candidateEmail');
+        const emailBodyTextArea = document.getElementById('emailBody');
+
+        const recordingPlayerModal = document.getElementById('recordingPlayerModal');
+        const modalMainVideoBox = document.getElementById('modalMainVideoBox');
+        const modalCandidateLabel = document.getElementById('modalCandidateLabel');
+        const modalActiveQuestionLabel = document.getElementById('modalActiveQuestionLabel');
+        const modalQuestionTextElement = document.getElementById('modalQuestionTextElement');
+        const modalAnswerTextElement = document.getElementById('modalAnswerTextElement');
+
+        const remarksModalOverlay = document.getElementById('remarksModalOverlay');
+        const remarksModalHeaderTitle = document.getElementById('remarksModalHeaderTitle');
+        const modalRemarksTextarea = document.getElementById('modalRemarksTextarea');
+
+        let activeRowRef = null;
+
+        function updateCounter() {
+            totalCountBubble.innerText = candidateListBody.getElementsByClassName('candidate-row').length;
+        }
+
+        closeEmailModalBtn.addEventListener('click', () => toggleEmailModal(false));
+        emailModalOverlay.addEventListener('click', (e) => { if (e.target === emailModalOverlay) toggleEmailModal(false); });
+
+        function toggleEmailModal(show) {
+            if (show) emailModalOverlay.classList.add('active');
+            else { emailModalOverlay.classList.remove('active'); emailInviteForm.reset(); activeRowRef = null; }
+        }
+
+        function toggleRecordingModal() {
+            recordingPlayerModal.classList.toggle('active');
+            if (!recordingPlayerModal.classList.contains('active')) {
+                modalMainVideoBox.pause();
+                modalMainVideoBox.src = "";
+            }
+        }
+
+        function closePopupOnBackdrop(e, modalId) {
+            if (e.target === document.getElementById(modalId)) {
+                if (modalId === 'recordingPlayerModal') toggleRecordingModal();
+                if (modalId === 'remarksModalOverlay') closeRemarksModal();
+            }
+        }
+
+        function triggerRemarksModal(candidateName) {
+            const rows = document.getElementsByClassName('candidate-row');
+            for (let row of rows) {
+                if (row.getAttribute('data-name') === candidateName) {
+                    activeRowRef = row;
+                    break;
+                }
+            }
+            if (activeRowRef) {
+                remarksModalHeaderTitle.innerText = `Admin Notes: ${candidateName}`;
+                modalRemarksTextarea.value = activeRowRef.getAttribute('data-remarks') || "";
+                remarksModalOverlay.classList.add('active');
+            }
+        }
+
+        function closeRemarksModal() {
+            remarksModalOverlay.classList.remove('active');
+            activeRowRef = null;
+        }
+
+        function saveRemarksModalPayload() {
+            if (activeRowRef) {
+                activeRowRef.setAttribute('data-remarks', modalRemarksTextarea.value.trim());
+                closeRemarksModal();
+            }
+        }
+
+        function launchRecordingPlayerModal(candidateName) {
+            modalCandidateLabel.innerText = candidateName;
+            jumpToTargetQuestionIndex(1, 'https://www.w3schools.com/html/mov_bbb.mp4');
+            recordingPlayerModal.classList.add('active');
+        }
+
+        function jumpToTargetQuestionIndex(qIndex, videoSrcUrl) {
+            document.querySelectorAll('.modal-q-node').forEach(node => node.classList.remove('active-q'));
+
+            const e = window.event || (arguments.callee.caller ? arguments.callee.caller.arguments[0] : null);
+            if (e && e.currentTarget) {
+                e.currentTarget.classList.add('active-q');
+            } else {
+                const nodes = document.querySelectorAll('.modal-q-node');
+                if (nodes[qIndex - 1]) nodes[qIndex - 1].classList.add('active-q');
+            }
+
+            modalActiveQuestionLabel.innerText = `Question ${qIndex} Active`;
+            modalMainVideoBox.src = videoSrcUrl;
+
+            const data = qaScriptMatrix[qIndex];
+            modalQuestionTextElement.innerText = `"${data.q}"`;
+            modalAnswerTextElement.innerText = `"${data.a}"`;
+
+            modalMainVideoBox.play();
+        }
+
+        function filterScreeningList() {
+            const query = searchName.value.toLowerCase().trim();
+            const deptValue = filterDept.value;
+            const subDeptValue = filterSubDept.value;
+            const statusValue = filterStatus.value;
+
+            const rows = candidateListBody.getElementsByClassName('candidate-row');
+            let visibleCount = 0;
+
+            for (let row of rows) {
+                const name = row.getAttribute('data-name').toLowerCase();
+                const dept = row.getAttribute('data-dept');
+                const subdept = row.getAttribute('data-subdept');
+                const status = row.getAttribute('data-status');
+
+                const matchesSearch = name.includes(query);
+                const matchesDept = (deptValue === 'all' || dept === deptValue);
+                const matchesSubDept = (subDeptValue === 'all' || subdept === subDeptValue);
+                const matchesStatus = (statusValue === 'all' || status === statusValue);
+
+                if (matchesSearch && matchesDept && matchesSubDept && matchesStatus) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        // Event listeners removed because filter inputs were deleted from the UI
+        // searchName.addEventListener('input', filterScreeningList);
+        // filterDept.addEventListener('change', filterScreeningList);
+        // filterSubDept.addEventListener('change', filterScreeningList);
+        // filterStatus.addEventListener('change', filterScreeningList);
+
+        function handleAction(dropdown) {
+            const selectedAction = dropdown.value;
+            const row = dropdown.closest('.candidate-row');
+            if (!row) return;
+
+            const candidateName = row.getAttribute('data-name');
+            const currentStatus = row.getAttribute('data-status');
+
+            if (selectedAction === 'delete') {
+                if (confirm(`Are you sure you want to completely delete ${candidateName} from the screening roster?`)) {
+                    row.remove();
+                    updateCounter();
+                    filterScreeningList();
+                }
+                dropdown.value = "";
+            }
+            else if (selectedAction === 'reshare') {
+                activeRowRef = row;
+                const parsedEmail = `${candidateName.toLowerCase().replace(/\s+/g, '.')}@example.com`;
+                candidateEmailInput.value = parsedEmail;
+
+                let contextNote = "complete your previous screening phase";
+                if (currentStatus === 'Expired') contextNote = "reappear since your previous validation link has timed out";
+                if (currentStatus === 'Completed') contextNote = "re-take the screening to log a brand new evaluation metric scorecard";
+
+                emailBodyTextArea.value = `Hi ${candidateName},\n\nWe have generated a brand new secure access token for you to ${contextNote}.\n\nPlease access the connection hub terminal using the link below at your earliest convenience to log your screening profile data.\n\nBest regards,\nElastiCrew Talent Team`;
+
+                toggleEmailModal(true);
+                dropdown.value = "";
+            }
+        }
+
+        emailInviteForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (activeRowRef) {
+                activeRowRef.setAttribute('data-status', 'Pending');
+                activeRowRef.cells[4].innerHTML = `<span class="stage-tag screening">Pending</span>`;
+
+                alert(`Success: Brand new invite link effectively dispatched to ${candidateEmailInput.value}.`);
+                toggleEmailModal(false);
+                filterScreeningList();
+            }
+        });
+
+        updateCounter();
+    </script>
+
+    <!-- HR Notes Modal -->
+    <div id="hrNotesModal" class="modal-overlay"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; width: 400px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden;">
+            <div
+                style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 16px; color: #0f172a; font-weight: 600;">HR Notes - <span
+                        id="notesCandidateName">Candidate</span></h3>
+                <button onclick="closeNotesModal()"
+                    style="background: none; border: none; cursor: pointer; color: #64748b;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div style="padding: 20px;">
+                <textarea id="hrNotesTextarea"
+                    style="width: 100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box;"
+                    placeholder="Add private HR notes here..."></textarea>
+            </div>
+            <div
+                style="padding: 16px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px;">
+                <button onclick="closeNotesModal()" class="btn-secondary"
+                    style="padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">Cancel</button>
+                <button onclick="saveNotes()" class="btn-primary"
+                    style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--primary-blue); color: white; font-weight: 600; cursor: pointer;">Save
+                    Notes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activeNoteBtn = null;
+
+        function openNotesModal(candidateName, btnElement) {
+            document.getElementById('notesCandidateName').innerText = candidateName;
+            activeNoteBtn = btnElement;
+
+            const existingNote = btnElement.getAttribute('data-note') || '';
+            document.getElementById('hrNotesTextarea').value = existingNote;
+
+            document.getElementById('hrNotesModal').classList.add('active');
+        }
+
+        function closeNotesModal() {
+            document.getElementById('hrNotesModal').classList.remove('active');
+            activeNoteBtn = null;
+        }
+
+        function saveNotes() {
+            if (!activeNoteBtn) return;
+
+            const textarea = document.getElementById('hrNotesTextarea');
+            const noteContent = textarea.value.trim();
+
+            if (noteContent.length > 0) {
+                activeNoteBtn.setAttribute('data-note', noteContent);
+                activeNoteBtn.style.background = '#0ea5e9';
+                activeNoteBtn.style.border = 'none';
+                activeNoteBtn.style.boxShadow = '0 2px 4px rgba(14, 165, 233, 0.3)';
+                activeNoteBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #10b981; border-radius: 50%; border: 2px solid white;"></span>
+                `;
+            } else {
+                activeNoteBtn.removeAttribute('data-note');
+                activeNoteBtn.style.background = '#f8fafc';
+                activeNoteBtn.style.border = '1px solid #e2e8f0';
+                activeNoteBtn.style.boxShadow = 'none';
+                activeNoteBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                `;
+            }
+
+            closeNotesModal();
+        }
+    </script>
+</body>
+
+</html>

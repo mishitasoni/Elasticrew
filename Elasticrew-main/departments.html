@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticrew - Department Configuration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- --- UNIFIED NAVY SIDEBAR MENU --- -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-brand">ElastiCrew</h1>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-menu-item"><a href="/hiring-queue.html"><span>Hiring Queue</span></a></li>
+            <li class="nav-menu-item"><a href="/"><span>All Candidates</span></a></li>
+            <li class="nav-menu-item"><a href="/assessments.html"><span>Assessments</span></a></li>
+            <li class="nav-menu-item"><a href="/reports.html"><span>Reports</span></a></li>
+            <li class="nav-menu-item"><a href="/dashboard.html"><span>Dashboard</span></a></li>
+            <li class="nav-menu-item active"><a href="/departments.html"><span>Departments</span></a></li>
+            <li class="nav-menu-item"><a href="/settings.html"><span>Settings</span></a></li>
+        </ul>
+        <div class="logout-container"><a href="#" class="logout-link"><span>Logout</span></a></div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+        <header class="header-actions">
+            <h1 class="page-title">Departments</h1>
+            <button class="btn-add" id="openDeptModalBtn">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                Add Department Map
+            </button>
+        </header>
+
+        <!-- DEPARTMENTS CONFIGURATION BOARD -->
+        <section class="candidates-section">
+            
+            <!-- MULTI-FILTER BAR ENGINE -->
+            <div class="filter-bar">
+                <div class="filter-group" style="width: 100%; justify-content: flex-start;">
+                    <select id="filterDeptName" class="filter-select">
+                        <option value="all">All Departments</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Design">Design</option>
+                        <option value="Product">Product</option>
+                        <option value="Operations">Operations</option>
+                    </select>
+
+                    <select id="filterSubDeptName" class="filter-select">
+                        <option value="all">All Sub Departments</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend">Backend</option>
+                        <option value="Full Stack">Full Stack</option>
+                        <option value="QA / Testing">QA / Testing</option>
+                        <option value="UI/UX">UI/UX</option>
+                        <option value="Visual Brand Art">Visual Brand Art</option>
+                    </select>
+
+                    <select id="filterExpTrack" class="filter-select">
+                        <option value="all">All Experience Tracks</option>
+                        <option value="Fresher">Fresher (0 Y)</option>
+                        <option value="Junior">Junior (1-3 Y)</option>
+                        <option value="Mid-Level">Mid-Level (3-5 Y)</option>
+                        <option value="Senior">Senior (5+ Y)</option>
+                        <option value="Lead">Lead (10+ Y)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- CONFIGURATION DATA LIST -->
+            <table class="candidate-table" id="deptTable">
+                <thead>
+                    <tr>
+                        <th>Department Name</th>
+                        <th>Sub-Departments Configured</th>
+                        <th>Target Experience Tracks</th>
+                        <th style="text-align: right; padding-right: 24px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="deptListBody">
+                    <tr class="dept-row" data-dept="Engineering" data-subdepts="Frontend, Backend, Full Stack, QA / Testing" data-exps="Junior (1-3 Y), Mid-Level (3-5 Y), Senior (5+ Y), Lead (10+ Y)">
+                        <td><strong>Engineering</strong></td>
+                        <td>Frontend, Backend, Full Stack, QA / Testing</td>
+                        <td>Junior (1-3 Y), Mid-Level (3-5 Y), Senior (5+ Y), Lead (10+ Y)</td>
+                        <td style="text-align: right;">
+                            <button class="btn-secondary" style="padding: 6px 12px; font-size: var(--font-size-small); color: #b91c1c;" onclick="removeDeptRow(this)">Remove</button>
+                        </td>
+                    </tr>
+                    <tr class="dept-row" data-dept="Design" data-subdepts="UI/UX, Visual Brand Art" data-exps="Fresher (0 Y), Junior (1-3 Y), Senior (5+ Y)">
+                        <td><strong>Design</strong></td>
+                        <td>UI/UX, Visual Brand Art</td>
+                        <td>Fresher (0 Y), Junior (1-3 Y), Senior (5+ Y)</td>
+                        <td style="text-align: right;">
+                            <button class="btn-secondary" style="padding: 6px 12px; font-size: var(--font-size-small); color: #b91c1c;" onclick="removeDeptRow(this)">Remove</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="noDeptResults" class="empty-state" style="display: none;">No configuration profiles match selected filter matrix criteria.</div>
+        </section>
+    </main>
+
+    <!-- CONFIGURATION POPUP MODAL -->
+    <div class="modal-overlay" id="deptModalOverlay">
+        <div class="modal-card">
+            <h2 class="modal-header">Configure Department Architecture</h2>
+            <form id="deptConfigForm">
+                
+                <!-- SELECT OR CREATE DROPDOWN CONTAINER -->
+                <div class="form-group">
+                    <label for="newMasterDept">Core Department</label>
+                    <select id="newMasterDept" class="form-control" required onchange="handleDeptSelection(this)">
+                        <option value="" disabled selected>Select Master Department</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Product">Product</option>
+                        <option value="Design">Design</option>
+                        <option value="Operations">Operations</option>
+                        <option value="CUSTOM_NEW" style="font-weight: 600; color: var(--primary-blue);">+ Add New Department</option>
+                    </select>
+                </div>
+
+                <!-- DYNAMICALLY HIDDEN TEXT FIELD FOR NEW ENTRIES -->
+                <div class="form-group" id="customDeptInputGroup" style="display: none; padding-left: 12px; border-left: 3px solid var(--primary-blue);">
+                    <label for="customDeptName">New Department Name</label>
+                    <input type="text" id="customDeptName" class="form-control" placeholder="Enter custom department title (e.g., Marketing)">
+                </div>
+
+                <div class="form-group">
+                    <label for="newSubDepts">Sub-Departments (Comma Separated Tokens)</label>
+                    <input type="text" id="newSubDepts" class="form-control" placeholder="e.g., Frontend, Backend, Full Stack" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Interview Experience Streams</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; font-size: var(--font-size-body);">
+                        <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" name="expTrack" value="Fresher (0 Y)" style="margin-right: 6px;"> Fresher (0 Years)</label>
+                        <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" name="expTrack" value="Junior (1-3 Y)" style="margin-right: 6px;"> Junior (1-3 Years)</label>
+                        <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" name="expTrack" value="Mid-Level (3-5 Y)" style="margin-right: 6px;"> Mid-Level (3-5 Years)</label>
+                        <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" name="expTrack" value="Senior (5+ Y)" style="margin-right: 6px;"> Senior (5+ Years)</label>
+                        <label style="font-weight: 500; cursor: pointer;"><input type="checkbox" name="expTrack" value="Lead (10+ Y)" style="margin-right: 6px;"> Lead (10+ Years)</label>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="closeDeptModalBtn">Cancel</button>
+                    <button type="submit" class="btn-submit">Register Unit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- REACTIVE RENDERING LOGIC PIPELINE -->
+    <script>
+        const openDeptModalBtn = document.getElementById('openDeptModalBtn');
+        const closeDeptModalBtn = document.getElementById('closeDeptModalBtn');
+        const deptModalOverlay = document.getElementById('deptModalOverlay');
+        const deptConfigForm = document.getElementById('deptConfigForm');
+        const deptListBody = document.getElementById('deptListBody');
+        
+        // Target Form Elements
+        const selectDeptField = document.getElementById('newMasterDept');
+        const customDeptInputGroup = document.getElementById('customDeptInputGroup');
+        const customDeptNameInput = document.getElementById('customDeptName');
+        
+        // Filter Handles
+        const filterDeptName = document.getElementById('filterDeptName');
+        const filterSubDeptName = document.getElementById('filterSubDeptName');
+        const filterExpTrack = document.getElementById('filterExpTrack');
+        const noDeptResults = document.getElementById('noDeptResults');
+
+        function toggleDeptModal(show) {
+            if (show) deptModalOverlay.classList.add('active');
+            else { 
+                deptModalOverlay.classList.remove('active'); 
+                deptConfigForm.reset(); 
+                customDeptInputGroup.style.display = 'none';
+                customDeptNameInput.removeAttribute('required');
+            }
+        }
+
+        openDeptModalBtn.addEventListener('click', () => toggleDeptModal(true));
+        closeDeptModalBtn.addEventListener('click', () => toggleDeptModal(false));
+        deptModalOverlay.addEventListener('click', (e) => { if (e.target === deptModalOverlay) toggleDeptModal(false); });
+
+        // Evaluates whether to reveal the new custom text input box
+        function handleDeptSelection(select) {
+            if (select.value === 'CUSTOM_NEW') {
+                customDeptInputGroup.style.display = 'block';
+                customDeptNameInput.setAttribute('required', 'true');
+                customDeptNameInput.focus();
+            } else {
+                customDeptInputGroup.style.display = 'none';
+                customDeptNameInput.removeAttribute('required');
+                customDeptNameInput.value = '';
+            }
+        }
+
+        // Relational Filter Logic Pipeline
+        function filterDepartments() {
+            const selectedDept = filterDeptName.value;
+            const selectedSubDept = filterSubDeptName.value.toLowerCase();
+            const selectedExp = filterExpTrack.value;
+            
+            const rows = deptListBody.getElementsByClassName('dept-row');
+            let visibleCounter = 0;
+
+            for (let row of rows) {
+                const rowDept = row.getAttribute('data-dept');
+                const rowSubDepts = row.getAttribute('data-subdepts').toLowerCase();
+                const rowExps = row.getAttribute('data-exps');
+
+                const matchesDept = (selectedDept === 'all' || rowDept === selectedDept);
+                const matchesSubDept = (selectedSubDept === 'all' || rowSubDepts.includes(selectedSubDept));
+                const matchesExp = (selectedExp === 'all' || rowExps.includes(selectedExp));
+
+                if (matchesDept && matchesSubDept && matchesExp) {
+                    row.style.display = '';
+                    visibleCounter++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+            noDeptResults.style.display = visibleCounter === 0 ? 'block' : 'none';
+        }
+
+        filterDeptName.addEventListener('change', filterDepartments);
+        filterSubDeptName.addEventListener('change', filterDepartments);
+        filterExpTrack.addEventListener('change', filterDepartments);
+
+        function removeDeptRow(button) {
+            if (confirm("Are you certain you want to tear down this configured department profile block?")) {
+                button.closest('.dept-row').remove();
+                filterDepartments();
+            }
+        }
+
+        // Form Registration Pipe
+        deptConfigForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Resolve raw value depending on selected mode context
+            let finalMasterDept = selectDeptField.value;
+            if (finalMasterDept === 'CUSTOM_NEW') {
+                finalMasterDept = customDeptNameInput.value.trim();
+                
+                // Capitalize correctly for visual consistency
+                finalMasterDept = finalMasterDept.charAt(0).toUpperCase() + finalMasterDept.slice(1);
+
+                // Engineering Inject: Feed the newly made value back to the selection nodes automatically
+                const newDropdownOption = document.createElement('option');
+                newDropdownOption.value = finalMasterDept;
+                newDropdownOption.textContent = finalMasterDept;
+                
+                // Insert it right before the "+ Add New Department" toggle slot
+                selectDeptField.insertBefore(newDropdownOption, selectDeptField.lastElementChild);
+                
+                // Also add it into our dashboard header filters dynamically
+                const filterOption = document.createElement('option');
+                filterOption.value = finalMasterDept;
+                filterOption.textContent = finalMasterDept;
+                filterDeptName.appendChild(filterOption);
+            }
+
+            const subTitleTokens = document.getElementById('newSubDepts').value.trim();
+            const checkedBoxes = document.querySelectorAll('input[name="expTrack"]:checked');
+            let selectedExps = [];
+            checkedBoxes.forEach(cb => selectedExps.push(cb.value));
+
+            if (selectedExps.length === 0) {
+                alert("Please select at least one experience track segment.");
+                return;
+            }
+
+            const formattedExpString = selectedExps.join(', ');
+
+            const newRow = document.createElement('tr');
+            newRow.className = 'dept-row';
+            newRow.setAttribute('data-dept', finalMasterDept);
+            newRow.setAttribute('data-subdepts', subTitleTokens);
+            newRow.setAttribute('data-exps', formattedExpString);
+
+            newRow.innerHTML = `
+                <td><strong>${finalMasterDept}</strong></td>
+                <td>${subTitleTokens}</td>
+                <td>${formattedExpString}</td>
+                <td style="text-align: right;">
+                    <button class="btn-secondary" style="padding: 6px 12px; font-size: var(--font-size-small); color: #b91c1c;" onclick="removeDeptRow(this)">Remove</button>
+                </td>
+            `;
+
+            deptListBody.appendChild(newRow);
+            toggleDeptModal(false);
+            filterDepartments();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticrew - Assessments Engine</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- TASK TOGGLE NAV BAR --- */
+        .assessment-toggle-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 8px;
+        }
+        .toggle-tab {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-inactive);
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.12s ease;
+        }
+        .toggle-tab.active {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+        }
+
+        /* --- MATRIX CONFIGURATION PANEL --- */
+        .matrix-filter-card {
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr) auto;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        /* --- VIDEO BOT ROSTER STYLING --- */
+        .question-builder-container {
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .q-entry-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .q-number-badge {
+            background: #e2e8f0;
+            color: #334155;
+            font-weight: 700;
+            font-size: 11px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .q-text-input { flex-grow: 1; border: none; background: transparent; font-size: 13px; color: var(--text-dark); font-weight: 500; }
+        .q-text-input:focus { outline: none; }
+        
+        /* --- MCQ EXCEL TEMPLATE GRID --- */
+        .excel-template-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .excel-header-banner {
+            background: #15803d;
+            color: #ffffff;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .excel-table th { background: #f1f5f9; color: #475569; padding: 8px; border: 1px solid #cbd5e1; text-align: left; }
+        .excel-table td { padding: 8px; border: 1px solid #cbd5e1; color: #334155; background: #fff; }
+
+        .upload-dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.15s ease;
+        }
+        .upload-dropzone:hover { border-color: #15803d; background: #f0fdf4; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR MENU -->
+    <nav class="sidebar">
+        <div class="sidebar-header"><h1 class="sidebar-brand">ElastiCrew</h1></div>
+        <ul class="nav-menu">
+            <li class="nav-menu-item"><a href="/hiring-queue.html"><span>Hiring Queue</span></a></li>
+            <li class="nav-menu-item"><a href="/"><span>All Candidates</span></a></li>
+            <li class="nav-menu-item active"><a href="/assessments.html"><span>Assessments</span></a></li>
+            <li class="nav-menu-item"><a href="/reports.html"><span>Reports</span></a></li>
+            <li class="nav-menu-item"><a href="/dashboard.html"><span>Dashboard</span></a></li>
+            <li class="nav-menu-item"><a href="/departments.html"><span>Departments</span></a></li>
+            <li class="nav-menu-item"><a href="/settings.html"><span>Settings</span></a></li>
+        </ul>
+        <div class="logout-container"><a href="#" class="logout-link"><span>Logout</span></a></div>
+    </nav>
+
+    <!-- MAIN CANVAS -->
+    <main class="main-content">
+        <header class="header-actions">
+            <h1 class="page-title">Assessment Management Engine</h1>
+        </header>
+
+        <!-- SUB TAB TOGGLE CONTAINER -->
+        <div class="assessment-toggle-bar">
+            <div class="toggle-tab active" id="tabVideoBotBtn" onclick="switchAssessmentView('videobot')">Video Bot Screening Questions</div>
+            <div class="toggle-tab" id="tabMcqBtn" onclick="switchAssessmentView('mcq')">MCQ Objective Assessments</div>
+        </div>
+
+        <!-- PROFILE ALLOCATION MATRIX FILTERS -->
+        <div class="matrix-filter-card">
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="margin-bottom:6px;">Target Department</label>
+                <select id="matrixDept" class="form-control" onchange="syncSubDepartments()">
+                    <option value="Operations">Operations</option>
+                    <option value="Engineering">Engineering</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="margin-bottom:6px;">Sub-Department Track</label>
+                <select id="matrixSubDept" class="form-control" onchange="loadConfiguredQuestions()">
+                    <!-- Populated dynamically via JS -->
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="margin-bottom:6px;">Experience Level</label>
+                <select id="matrixExp" class="form-control" onchange="loadConfiguredQuestions()">
+                    <option value="Fresher(0)">Fresher(0)</option>
+                    <option value="Junior(1-3)">Junior(1-3)</option>
+                    <option value="Mid Level(3-5)">Mid Level(3-5)</option>
+                    <option value="Senior(5+)">Senior(5+)</option>
+                    <option value="Lead(10+)">Lead(10+)</option>
+                </select>
+            </div>
+            <button class="btn-submit" style="background-color: var(--primary-blue); height: 35px;" onclick="saveCurrentMatrixConfig()">Save Configuration</button>
+        </div>
+
+        <!-- PANEL A: INTERACTIVE VIDEO BOT WORKSPACE -->
+        <div id="sectionVideoBot" class="question-builder-container">
+            <div class="flex-between" style="margin-bottom: 14px;">
+                <div>
+                    <h3 style="font-size: 14px; font-weight:700; color: var(--text-dark);" id="videoCardTitle">Operations - HR (Fresher(0)) Interview Parameters</h3>
+                    <p style="font-size:12px; color: var(--text-muted);">Configure custom question limits seamlessly. Changes apply to newly generated invite links.</p>
+                </div>
+                <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="appendNewEmptyQuestion()">+ Add Target Question</button>
+            </div>
+
+            <!-- Question Stack Canvas -->
+            <div id="videoQuestionStackBox">
+                <!-- Injected dynamically based on experience matrix rules -->
+            </div>
+        </div>
+
+        <!-- PANEL B: MCQ BULK SPREADSHEET UPLOADER -->
+        <div id="sectionMcq" class="question-builder-container" style="display: none;">
+            <div>
+                <h3 style="font-size: 14px; font-weight:700; color: var(--text-dark);">Bulk Upload Objective Questions</h3>
+                <p style="font-size:12px; color: var(--text-muted); margin-bottom: 16px;">Map questions directly to the selected profile by uploading your formatted spreadsheet.</p>
+            </div>
+
+            <!-- EXCEL STRUCTURAL TEMPLATE PREVIEW REFERENCE -->
+            <div class="excel-template-box">
+                <div class="excel-header-banner">
+                    <span>📊 REQUIRED EXCEL TEMPLATE STRUCTURE (.XLSX Schema Reference)</span>
+                    <span style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px; font-size: 10px; cursor: pointer;">Download Blank Template</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="excel-table">
+                        <thead>
+                            <tr>
+                                <th>QuestionText</th>
+                                <th>OptionA</th>
+                                <th>OptionB</th>
+                                <th>OptionC</th>
+                                <th>OptionD</th>
+                                <th>CorrectAnswer</th>
+                                <th>PointsValue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>What is the primary methodology used to optimize query performance in indexed tables?</td>
+                                <td>Linear scanning algorithm loops</td>
+                                <td>Composite B-Tree index node mapping</td>
+                                <td>Asynchronous execution threads</td>
+                                <td>Explicit structural casting</td>
+                                <td>B</td>
+                                <td>10</td>
+                            </tr>
+                            <tr>
+                                <td>Which corporate protocol handles explicit cross-origin resource allocations natively?</td>
+                                <td>CORS middleware header matrix</td>
+                                <td>SMTP transport pipelines</td>
+                                <td>GraphQL endpoint schema parsing</td>
+                                <td>Basic base64 payload streams</td>
+                                <td>A</td>
+                                <td>5</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- UPLOAD DROPZONE ELEMENT -->
+            <div class="upload-dropzone" onclick="triggerNativeFileSelect()">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div style="font-size: 13px; font-weight: 700; color: #1e293b;">Click to browse or drop formatted Excel sheets here</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Supports secure parsing for .xlsx and .csv files</div>
+                <input type="file" id="nativeFileInput" style="display: none;" onchange="handleExcelUploadPayload(this)">
+            </div>
+        </div>
+    </main>
+
+    <!-- CODE INTERACTIVE ENGINE -->
+    <script>
+        // Updated mapping data matching your precise experience string structures
+        const questionDatabaseMatrix = {
+            "Operations|HR|Fresher(0)": [
+                "Tell us about yourself and what motivated you to pursue a career in HR operations?",
+                "How do you prioritize your daily tasks when faced with multiple competing deadlines?",
+                "Describe your familiarity with basic office productivity tools and spreadsheets.",
+                "How do you maintain focus and accuracy when performing repetitive data entry tasks?",
+                "What step would you take if you were unsure how to handle a candidate documentation issue?"
+            ],
+            "Operations|HR|Junior(1-3)": [
+                "Walk us through your experience coordinating candidate pipeline data loops.",
+                "How do you handle internal compliance steps when onboarding fresh team rosters?",
+                "What strategies do you use to manage scheduling timelines across varying time zones?",
+                "Describe a situation where you successfully resolved a scheduling conflict between interviewers.",
+                "Which applicant tracking system modules are you most proficient in utilizing?"
+            ],
+            "Operations|HR|Mid Level(3-5)": [
+                "How do you optimize candidate screening touchpoints to improve overall pipeline conversions?",
+                "Detail your process for audit-checking employee resource logs against localized labor rules.",
+                "How do you address sudden drop-offs or bottleneck constraints within specific recruitment tracks?",
+                "Describe your approach to training junior HR coordinators on system documentation policies.",
+                "How do you leverage data reports to provide weekly pipeline summaries to department heads?"
+            ],
+            "Operations|HR|Senior(5+)": [
+                "How do you design, execute, and scale regional recruitment operational frameworks from scratch?",
+                "Detail your stakeholder management strategy when department heads request unrealistic allocation timelines.",
+                "How do you mitigate compliance risks during large-scale, high-velocity hiring cycles?",
+                "What key performance indicators (KPIs) do you prioritize to track overall HR operations health?",
+                "Describe a time you completely overhauled a broken administrative workflow to save processing costs."
+            ],
+            "Operations|HR|Lead(10+)": [
+                "How do you construct global workforce talent allocation models aligned with enterprise fiscal budgets?",
+                "Explain your approach to implementing predictive assessment scoring systems across non-technical tracks.",
+                "How do you manage, mentor, and inspire cross-functional operational teams across distributed international landscapes?",
+                "Detail your corporate conflict resolution roadmap when handling sensitive executive team grievances.",
+                "How do you design an adaptive operational agility model to survive sudden macroeconomic structural changes?"
+            ],
+            
+            // Engineering Profile fallbacks
+            "Engineering|Full Stack|Fresher(0)": [
+                "What programming languages are you most comfortable with, and what projects have you built using them?",
+                "Explain the difference between client-side rendering and server-side rendering.",
+                "How do you test and debug your code when an unexpected application error occurs?"
+            ],
+            "Engineering|Full Stack|Junior(1-3)": [
+                "Explain the exact event loop architecture execution paths inside production Node.js instances.",
+                "How do you resolve complex asynchronous CORS exception loops within your Express route configurations?",
+                "Detail your standard database optimization steps when dealing with slow lookup queries."
+            ]
+        };
+
+        const trackRelations = {
+            "Operations": ["HR", "Logistics", "Compliance"],
+            "Engineering": ["Full Stack", "DevOps", "Data Platform"]
+        };
+
+        // DOM Pointers
+        const matrixDept = document.getElementById('matrixDept');
+        const matrixSubDept = document.getElementById('matrixSubDept');
+        const matrixExp = document.getElementById('matrixExp');
+        const videoQuestionStackBox = document.getElementById('videoQuestionStackBox');
+        const videoCardTitle = document.getElementById('videoCardTitle');
+
+        const sectionVideoBot = document.getElementById('sectionVideoBot');
+        const sectionMcq = document.getElementById('sectionMcq');
+        const tabVideoBotBtn = document.getElementById('tabVideoBotBtn');
+        const tabMcqBtn = document.getElementById('tabMcqBtn');
+
+        // Toggle View Tab System
+        function switchAssessmentView(targetTab) {
+            if (targetTab === 'videobot') {
+                tabVideoBotBtn.classList.add('active');
+                tabMcqBtn.classList.remove('active');
+                sectionVideoBot.style.display = 'block';
+                sectionMcq.style.display = 'none';
+            } else {
+                tabMcqBtn.classList.add('active');
+                tabVideoBotBtn.classList.remove('active');
+                sectionVideoBot.style.display = 'none';
+                sectionMcq.style.display = 'block';
+            }
+        }
+
+        // Sync track mappings dropdown selectors
+        function syncSubDepartments() {
+            const currentDept = matrixDept.value;
+            matrixSubDept.innerHTML = '';
+            trackRelations[currentDept].forEach(track => {
+                const opt = document.createElement('option');
+                opt.value = track;
+                opt.textContent = track;
+                matrixSubDept.appendChild(opt);
+            });
+            loadConfiguredQuestions();
+        }
+
+        // Render accurate length array questions based on matrix keys
+        function loadConfiguredQuestions() {
+            const key = `${matrixDept.value}|${matrixSubDept.value}|${matrixExp.value}`;
+            videoCardTitle.innerText = `${matrixDept.value} - ${matrixSubDept.value} (${matrixExp.value}) Interview Parameters`;
+            
+            videoQuestionStackBox.innerHTML = '';
+            
+            // Fallback default set if matrix key path isn't explicitly seeded above
+            const dynamicSet = questionDatabaseMatrix[key] || [
+                "Please describe your technical background and experience level with core development tools.",
+                "How do you ensure data accuracy and track exceptions within your workflow pipelines?",
+                "Describe a challenging technical constraint you encountered and how you resolved it.",
+                "How do you approach learning a completely new structural framework or corporate protocol?",
+                "What methods do you employ to collaborate cleanly and share documentation within distributed engineering teams?"
+            ];
+
+            dynamicSet.forEach((qText, index) => {
+                renderQuestionItemRow(index + 1, qText);
+            });
+        }
+
+        function renderQuestionItemRow(num, text) {
+            const row = document.createElement('div');
+            row.className = 'q-entry-row';
+            row.innerHTML = `
+                <div class="q-number-badge">${num}</div>
+                <input type="text" class="q-text-input" value="${text}">
+                <button style="background:none; border:none; color:#94a3b8; font-size:16px; cursor:pointer;" onclick="this.closest('.q-entry-row').remove(); rebuildQuestionIndices();">&times;</button>
+            `;
+            videoQuestionStackBox.appendChild(row);
+        }
+
+        function appendNewEmptyQuestion() {
+            const nextIndex = videoQuestionStackBox.getElementsByClassName('q-entry-row').length + 1;
+            renderQuestionItemRow(nextIndex, "Enter custom target evaluation prompt text here...");
+        }
+
+        function rebuildQuestionIndices() {
+            const rows = videoQuestionStackBox.getElementsByClassName('q-entry-row');
+            Array.from(rows).forEach((row, i) => {
+                row.querySelector('.q-number-badge').innerText = i + 1;
+            });
+        }
+
+        function saveCurrentMatrixConfig() {
+    // 1. Pull current questions array from workspace list views
+    const key = `${matrixDept.value}|${matrixSubDept.value}|${matrixExp.value}`;
+    const inputs = videoQuestionStackBox.getElementsByClassName('q-text-input');
+    let currentSetQuestions = [];
+    
+    Array.from(inputs).forEach(input => {
+        if(input.value.trim() !== "") currentSetQuestions.push(input.value.trim());
+    });
+
+    // 2. Fetch existing pool database state string object, overwrite target key, commit back to storage
+    let currentPools = JSON.parse(localStorage.getItem('elasticrew_question_matrix')) || baselineFallbackDatabase;
+    currentPools[key] = currentSetQuestions;
+    localStorage.setItem('elasticrew_question_matrix', JSON.stringify(currentPools));
+
+    alert(`Success: Question configuration pool set for ${matrixDept.value} -> ${matrixSubDept.value} (${matrixExp.value}) has been updated globally.`);
+}
+
+        // MCQ Upload Actions
+        function triggerNativeFileSelect() { document.getElementById('nativeFileInput').click(); }
+        function handleExcelUploadPayload(input) {
+            if (input.files && input.files[0]) {
+                alert(`Excel Parser Connected: Successfully uploaded "${input.files[0].name}". Objective questions parsed and mapped directly to the ${matrixSubDept.value} (${matrixExp.value}) evaluation profile schema.`);
+                input.value = '';
+            }
+        }
+
+        // Lifecycle Entry Initialization
+        syncSubDepartments();
+    </script>
+</body>
+</html>

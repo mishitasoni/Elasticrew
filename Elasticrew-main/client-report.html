@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElastiCrew Secure Report - James Anderson</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- STRENGTHENED VIEWPORT LOCK (STRICTLY SCROLL-FREE) --- */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #1e293b;
+            box-sizing: border-box;
+        }
+
+        .viewport-dashboard-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 24px; /* Balanced page perimeter padding */
+            box-sizing: border-box;
+        }
+        
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-center { display: flex; align-items: center; gap: 8px; }
+
+        /* --- THE THREE-COLUMN PARALLEL VIEW SYSTEM --- */
+        .parallel-columns-workspace {
+            display: grid;
+            grid-template-columns: 320px 1fr 1fr; /* Sized layout grid tracking cards proportionally */
+            gap: 16px;
+            flex-grow: 1;
+            height: 100%; /* Spans full viewport container layout natively */
+            min-height: 0;
+        }
+
+        .dashboard-card { 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 10px; 
+            padding: 18px; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 0;
+        }
+        
+        .card-header-line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; flex-shrink: 0; }
+        .card-header-line h3 { font-size: 12px; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; }
+        
+        .card-scrollable-content { flex-grow: 1; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; }
+
+        /* --- CONSOLIDATED MERGED RESUME INTEGRATION STYLES --- */
+        .merged-profile-identity {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+        .avatar-img-embedded { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #e2e8f0; }
+        .embedded-info h2 { font-size: 16px; font-weight: 700; margin: 0 0 2px 0; color: #0f172a; }
+        .embedded-info p { font-size: 12.5px; color: #64748b; margin: 0; }
+
+        .tech-tag-badge { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; }
+        .inline-badge-list { display: flex; flex-wrap: wrap; gap: 4px; }
+
+        /* --- FIXED SIZING CONSTRAINTS FOR MEDIA ASSETS --- */
+        .resizable-video-frame {
+            width: 100%;
+            background: #000;
+            border-radius: 6px;
+            height: 200px; /* Slightly scaled up video footprint now that header is scrubbed */
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        /* --- FLATTENED 4x2 CLIPS SELECTION GRID --- */
+        .clips-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        .clip-matrix-node {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 6px 2px;
+            text-align: center;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.1s ease;
+        }
+        .clip-matrix-node:hover {
+            background: #e0e7ff;
+            border-color: #2563eb;
+            color: #1e40af;
+        }
+        .clip-matrix-node.active-clip {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #1d4ed8;
+        }
+
+        /* --- FIXED VERTICAL ALIGNMENT FOOTER SPLITS --- */
+        .horizontal-split-footer { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            border-top: 1px solid #f1f5f9; 
+            padding-top: 12px; 
+            margin-top: auto; 
+            flex-shrink: 0;
+            height: 185px; /* Expanded insights track height */
+        }
+        .footer-split-section { display: flex; flex-direction: column; min-height: 0; }
+        .footer-split-section h4 { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin: 0 0 6px 0; letter-spacing: 0.5px; flex-shrink: 0; }
+        
+        .box-scroll-transcript { 
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 6px; 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 10px; 
+            font-size: 11.5px; 
+            line-height: 1.4; 
+        }
+        .timeline-stamp-row { display: flex; gap: 8px; margin-bottom: 4px; }
+        .timeline-stamp-row span { font-family: monospace; color: #64748b; font-weight: 600; min-width: 32px; }
+        .progress-bar-track { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; margin-bottom: 6px; }
+        
+        .expand-link-trigger { font-size: 10px; color: #2563eb; font-weight: 700; cursor: pointer; text-transform: none; }
+        .expand-link-trigger:hover { text-decoration: underline; }
+
+        /* --- CONSTRAINED OVERLAY MODALS --- */
+        .video-popup-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(15, 23, 42, 0.6); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 9999; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.15s ease; 
+        }
+        .video-popup-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .video-popup-card { 
+            background: #ffffff; 
+            border-radius: 10px; 
+            width: 540px; 
+            max-width: 90%; 
+            padding: 20px; 
+            max-height: 75vh; 
+            overflow-y: auto; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .popup-qa-block { border-bottom: 1px solid #e2e8f0; padding: 12px 0; }
+        .popup-qa-block:last-child { border-bottom: none; }
+        .popup-question-txt { font-weight: 700; color: #1e3a8a; font-size: 13px; margin-bottom: 4px; }
+        .popup-answer-txt { font-size: 12.5px; color: #334155; line-height: 1.5; padding-left: 10px; border-left: 2px solid #e2e8f0; }
+        
+        .popup-detail-card-row { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="viewport-dashboard-container">
+
+        <!-- --- THREE-COLUMN GRID WORKING ENVIRONMENT IN PARALLEL --- -->
+        <main class="parallel-columns-workspace">
+            
+            <!-- COLUMN 1: CANDIDATE PROFILE & RESUME UNIFIED CARD -->
+            <div class="dashboard-card">
+                <div class="card-header-line">
+                    <h3>Candidate Profile</h3>
+                    <span class="expand-link-trigger" onclick="togglePopupModal('resumePopup')">ElastiCrew Resume &rarr;</span>
+                </div>
+                
+                <!-- MERGED TOP IDENTITY BLOCK INTO THE CARD SYSTEM FLOW -->
+                <div class="merged-profile-identity">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="avatar-img-embedded" alt="James Anderson">
+                    <div class="embedded-info">
+                        <h2>James Anderson</h2>
+                        <p>Software Engineer</p>
+                    </div>
+                </div>
+
+                <div class="card-scrollable-content">
+                    
+                    
+                    <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:4px;">Key Highlights</div>
+                    <ul style="font-size:11.5px; padding-left:14px; margin:0 0 16px 0; line-height:1.5; color:#334155;">
+                        <li>Well structured document architecture</li>
+                        <li>Strong backend core engineering logic</li>
+                        <li>Relevant microservices background</li>
+                        <li>Good structural clarity visible inside projects</li>
+                    </ul>
+
+                    <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:6px; border-top:1px solid #f1f5f9; padding-top:10px;">Tech Stack Identified</div>
+                    <div class="inline-badge-list">
+                        <span class="tech-tag-badge">Python</span><span class="tech-tag-badge">Django</span>
+                        <span class="tech-tag-badge">FastAPI</span><span class="tech-tag-badge">PostgreSQL</span>
+                        <span class="tech-tag-badge">AWS</span><span class="tech-tag-badge">Docker</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 2: VIDEO BOT SCREENING CARD (SCROLL-FREE MEDIA & CLIPS) -->
+            <div class="dashboard-card">
+                <div class="card-header-line">
+                    <h3>Video Bot Screening</h3>
+                    <span style="font-size: 11px; color:#2563eb; font-weight:600;" id="screeningPlaybackStatusText">Q1 Active</span>
+                </div>
+                
+                <video id="screeningMainPlayer" controls class="resizable-video-frame">
+                    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                </video>
+
+                <div class="clips-matrix-grid">
+                    <div class="clip-matrix-node active-clip" onclick="swapScreeningClip(1, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q1</div>
+                    <div class="clip-matrix-node" onclick="swapScreeningClip(2, 'https://www.w3schools.com/html/movie.mp4')">Q2</div>
+                    <div class="clip-matrix-node" onclick="swapScreeningClip(3, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q3</div>
+                    <div class="clip-matrix-node" onclick="swapScreeningClip(4, 'https://www.w3schools.com/html/movie.mp4')">Q4</div>
+                    <div class="clip-matrix-node" onclick="swapScreeningClip(5, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q5</div>
+                    <div class="clip-matrix-node" onclick="swapScreeningClip(6, 'https://www.w3schools.com/html/movie.mp4')">Q6</div>
+                    <div class="clip-matrix-node" onclick="swapScreeningClip(7, 'https://www.w3schools.com/html/mov_bbb.mp4')">Q7</div>
+                    <div class="clip-matrix-node" onclick="swapScreeningClip(8, 'https://www.w3schools.com/html/movie.mp4')">Q8</div>
+                </div>
+
+                <!-- HORIZONTALLY ALIGNED INTEGRATED DATA SECTIONS -->
+                <div class="horizontal-split-footer">
+                    <div class="footer-split-section">
+                        <div class="flex-between" style="margin-bottom: 4px;">
+                            <h4>Transcript</h4>
+                            <span class="expand-link-trigger" onclick="togglePopupModal('transcriptPopup')">View Full</span>
+                        </div>
+                        <div class="box-scroll-transcript">
+                            <div class="timeline-stamp-row"><span>00:12</span><div><strong>AI Bot:</strong> Tell us how you structure route exceptions.</div></div>
+                            <div class="timeline-stamp-row"><span>00:45</span><div><strong>Cand:</strong> I route errors straight through global try-catch exception blocks.</div></div>
+                        </div>
+                    </div>
+                    <div class="footer-split-section">
+                        <div class="flex-between" style="margin-bottom: 4px;">
+                            <h4>AI Analysis</h4>
+                            <span class="expand-link-trigger" onclick="togglePopupModal('screeningAiPopup')">View Full</span>
+                        </div>
+                        <div class="box-scroll-transcript" style="background:#fff;">
+                            <div class="progress-bar-track"><span>Communication</span><strong>80%</strong></div>
+                            <div class="progress-bar-track"><span>Confidence</span><strong>85%</strong></div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 3: TECHNICAL PANEL INTERVIEW CARD -->
+            <div class="dashboard-card">
+                <div class="card-header-line">
+                    <h3>Technical Interview</h3>
+                    <button class="kl-check-btn" style="background:#7c3aed; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer;" onclick="togglePopupModal('codePopup')">📝 Submitted Code</button>
+                </div>
+                
+                <video controls class="resizable-video-frame" poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=60">
+                    <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+                </video>
+
+                <!-- HORIZONTALLY ALIGNED INTEGRATED DATA SECTIONS -->
+                <div class="horizontal-split-footer">
+                    <div class="footer-split-section">
+                        <div class="flex-between" style="margin-bottom: 4px;">
+                            <h4>Transcript</h4>
+                            <span class="expand-link-trigger" onclick="togglePopupModal('techTranscriptPopup')">View Full</span>
+                        </div>
+                        <div class="box-scroll-transcript">
+                            <div class="timeline-stamp-row"><span>10:15</span><div><strong>Lead:</strong> Break down your chosen sorting Big O parameters here.</div></div>
+                            <div class="timeline-stamp-row"><span>11:40</span><div><strong>Cand:</strong> Hash map maps lookup operations back to constant execution times.</div></div>
+                        </div>
+                    </div>
+                    <div class="footer-split-section">
+                        <div class="flex-between" style="margin-bottom: 4px;">
+                            <h4>AI Analysis</h4>
+                            <span class="expand-link-trigger" onclick="togglePopupModal('techEvalPopup')">View Full</span>
+                        </div>
+                        <div class="box-scroll-transcript" style="background:#fff;">
+                            <div class="progress-bar-track"><span>Core Engineering</span><strong>92%</strong></div>
+                            <div class="progress-bar-track"><span>Algorithmic Logic</span><strong>90%</strong></div>
+                            <div class="progress-bar-track"><span>System Architecture</span><strong>88%</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- --- CONSTRAINED OVERLAY MODALS --- -->
+
+    <!-- MODAL 1: RESUME POPUP -->
+    <div class="video-popup-overlay" id="resumePopup" onclick="closePopupOnBackdrop(event, 'resumePopup')">
+        <div class="video-popup-card">
+            <div class="flex-between" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:13px; font-weight:700; color:#0f172a; margin:0;">Resume Dossier: James Anderson</h3>
+                <button style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height: 1;" onclick="togglePopupModal('resumePopup')">&times;</button>
+            </div>
+            <div style="font-size: 12.5px; line-height: 1.6; color:#334155;">
+                <p><strong>Professional Contact:</strong> james.anderson@example.com</p>
+                <p><strong>Education Background:</strong> B.S. in Computer Science &bull; University of California</p>
+                <h4 style="color:#1e3a8a; margin: 12px 0 6px 0; font-size:11.5px; text-transform:uppercase; font-weight: 700;">Work History</h4>
+                <p><strong>Senior Software Engineer &bull; Tech Solutions Inc</strong><br>
+                Architected async microservices pipelines processing concurrent request nodes. Maintained token whitelisting models across MERN architectures.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: SCREENING FULL TRANSCRIPT POPUP -->
+    <div class="video-popup-overlay" id="transcriptPopup" onclick="closePopupOnBackdrop(event, 'transcriptPopup')">
+        <div class="video-popup-card">
+            <div class="flex-between" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:13px; font-weight:700; color:#0f172a; margin:0;">Conversational Video Transcript</h3>
+                <button style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height: 1;" onclick="togglePopupModal('transcriptPopup')">&times;</button>
+            </div>
+            <div style="max-height: 50vh; overflow-y: auto;">
+                <div class="popup-qa-block">
+                    <div class="popup-question-txt">Question 1: Walk us through your microservices experience?</div>
+                    <div class="popup-answer-txt">I built decoupled backend layers using Express and Django, separating operations into separate dynamic service layers.</div>
+                </div>
+                <div class="popup-qa-block">
+                    <div class="popup-question-txt">Question 2: How do you handle CORS cross-origin configuration arrays?</div>
+                    <div class="popup-answer-txt">I establish a secure whitelisting array pulled out of deployment configuration files, instantly dropping unauthorized endpoints.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: SCREENING AI ANALYSIS POPUP -->
+    <div class="video-popup-overlay" id="screeningAiPopup" onclick="closePopupOnBackdrop(event, 'screeningAiPopup')">
+        <div class="video-popup-card">
+            <div class="flex-between" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:13px; font-weight:700; color:#0f172a; margin:0;">Screening Behavioral Assessment</h3>
+                <button style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height: 1;" onclick="togglePopupModal('screeningAiPopup')">&times;</button>
+            </div>
+            <div class="popup-detail-card-row">
+                <div style="font-weight:700; font-size:12px; color:#1e293b; margin-bottom:4px;">Communication Breakdown (80%)</div>
+                <p style="font-size:12px; color:#475569; margin:0; line-height:1.4;">Candidate communicates complex systems thoughts clearly. Vocabulary index matches target senior engineer expectations perfectly.</p>
+            </div>
+            <div class="popup-detail-card-row">
+                <div style="font-weight:700; font-size:12px; color:#1e293b; margin-bottom:4px;">Confidence & Delivery Synthesis (85%)</div>
+                <p style="font-size:12px; color:#475569; margin:0; line-height:1.4;">Maintains regular pacing and steady posture track lines during complex problem exploration answers.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: TECHNICAL INTERVIEW COMPLETE TRANSCRIPT POPUP -->
+    <div class="video-popup-overlay" id="techTranscriptPopup" onclick="closePopupOnBackdrop(event, 'techTranscriptPopup')">
+        <div class="video-popup-card">
+            <div class="flex-between" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin:0;">Live Technical Interview Transcript</h3>
+                <button style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height: 1;" onclick="togglePopupModal('techTranscriptPopup')">&times;</button>
+            </div>
+            <div style="max-height: 50vh; overflow-y: auto; font-size: 12.5px; line-height: 1.5;">
+                <p><strong>[10:15] Panellist (Sarah):</strong> "Walk me through how your algorithmic map manages execution steps here."</p>
+                <p style="background:#f8fafc; padding:8px; border-radius:4px; margin:4px 0 12px 12px; border-left:2px solid #7c3aed;"><strong>[10:42] Candidate:</strong> "By storing lookup markers inside a localized hash dictionary map object context, I reduce lookup operations down to constant time complexity bounds."</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: TECHNICAL EVALUATION ANALYSIS POPUP -->
+    <div class="video-popup-overlay" id="techEvalPopup" onclick="closePopupOnBackdrop(event, 'techEvalPopup')">
+        <div class="video-popup-card">
+            <div class="flex-between" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:13px; font-weight:700; color:#0f172a; margin:0;">Technical Scorecard & Panel Review</h3>
+                <button style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height: 1;" onclick="togglePopupModal('techEvalPopup')">&times;</button>
+            </div>
+            <div class="popup-detail-card-row">
+                <div style="font-weight:700; font-size:12px; color:#111827;">Core Engineering Core Match (92%)</div>
+                <p style="font-size:12px; color:#4b5563; margin:2px 0 0 0;">Demonstrates exceptional depth in object-oriented programming designs and clean modular separation architectures.</p>
+            </div>
+            <div class="popup-detail-card-row">
+                <div style="font-weight:700; font-size:12px; color:#111827;">Algorithmic Logic Verification (90%)</div>
+                <p style="font-size:12px; color:#4b5563; margin:2px 0 0 0;">Identified optimization targets immediately. Solved the array traversal constraints without adding redundant runtime overhead.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 6: SUBMITTED CODE TERMINAL POPUP -->
+    <div class="video-popup-overlay" id="codePopup" onclick="closePopupOnBackdrop(event, 'codePopup')">
+        <div class="video-popup-card">
+            <div class="flex-between" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:13px; font-weight:700; color:#0f172a; margin:0;">KL Editor Code Submission</h3>
+                <button style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height: 1;" onclick="togglePopupModal('codePopup')">&times;</button>
+            </div>
+            <pre style="background: #0f141c; color: #abb2bf; padding: 14px; border-radius: 6px; font-family: monospace; font-size: 12.5px; margin: 0; overflow-x: auto;"><code>def two_sum(nums, target):
+    seen = {}
+    for i, num in enumerate(nums):
+        diff = target - num
+        if diff in seen:
+            return [seen[diff], i]
+        seen[num] = i
+    return []</code></pre>
+        </div>
+    </div>
+
+    <!-- RUNTIME CONTROLLER SCRIPTS -->
+    <script>
+        const screeningMainPlayer = document.getElementById('screeningMainPlayer');
+        const screeningPlaybackStatusText = document.getElementById('screeningPlaybackStatusText');
+
+        function togglePopupModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.toggle('active');
+            }
+        }
+
+        function closePopupOnBackdrop(e, id) {
+            if (e.target === document.getElementById(id)) {
+                togglePopupModal(id);
+            }
+        }
+
+        function swapScreeningClip(questionNumber, videoSrcUrl) {
+            const nodes = document.getElementsByClassName('clip-matrix-node');
+            for (let node of nodes) {
+                node.classList.remove('active-clip');
+            }
+
+            const e = window.event || arguments.callee.caller.arguments[0];
+            e.currentTarget.classList.add('active-clip');
+
+            screeningPlaybackStatusText.innerText = `Q${questionNumber} Active`;
+            screeningMainPlayer.src = videoSrcUrl;
+            screeningMainPlayer.play();
+        }
+    </script>
+</body>
+</html>

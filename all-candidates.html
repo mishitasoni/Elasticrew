@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticrew - All Candidates</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- ENHANCED & WIDENED COMFORTABLE MODAL FOOTPRINT --- */
+        .email-modal-card {
+            max-width: 640px !important; /* Expanded width footprint */
+            width: 90% !important;
+            max-height: 90vh !important; /* Balanced window viewport bounding box */
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; /* Restricts dual scrollbars entirely */
+            padding: 24px 28px !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-scrollable-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px; /* Uniform linear flow spacing grid */
+            margin-top: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 0 !important; /* Controlled via structural flex gaps */
+        }
+
+        .form-group label {
+            margin-bottom: 6px !important;
+            font-size: 12.5px !important;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .form-control {
+            padding: 8px 12px !important;
+            font-size: 13px !important;
+            height: auto !important;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .textarea-body {
+            height: 110px !important;
+            resize: none;
+        }
+
+        .textarea-remarks {
+            height: 70px !important;
+            resize: none;
+            background-color: #fafafa;
+        }
+        .textarea-remarks:focus {
+            background-color: #ffffff;
+        }
+
+        .modal-actions {
+            margin-top: 8px !important;
+            padding-top: 14px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* --- STATUS DROP-DOWN PILL STYLES --- */
+        .status-select-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .grid-status-dropdown {
+            padding: 4px 24px 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .grid-status-dropdown:focus {
+            outline: none;
+            border-color: #cbd5e1;
+        }
+        
+        /* Status Colors Mapping Matrix */
+        .status-active { background-color: #dcfce7; color: #15803d; }
+        .status-onhold { background-color: #fef9c3; color: #a16207; }
+        .status-rejected { background-color: #fee2e2; color: #b91c1c; }
+        .status-hired { background-color: #ccfbf1; color: #0f766e; }
+        .status-withdrawn { background-color: #e2e8f0; color: #475569; }
+
+        .timestamp-txt {
+            font-family: monospace;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR MENU -->
+    <nav class="sidebar">
+        <div class="sidebar-header"><h1 class="sidebar-brand">ElastiCrew</h1></div>
+        <ul class="nav-menu">
+            <li class="nav-menu-item"><a href="hiring-queue.html?v=3"><span>Hiring Queue</span></a></li>
+<<<<<<< HEAD
+            <li class="nav-menu-item"><a href="resume-queue.html?v=3"><span>Resume Queue</span></a></li>
+            <li class="nav-menu-item active"><a href="all-candidates.html?v=3"><span>All Candidates</span></a></li>
+            <li class="nav-menu-item"><a href="resume-view.html?v=3"><span>View Resume</span></a></li>
+=======
+            <li class="nav-menu-item active"><a href="all-candidates.html?v=3"><span>All Candidates</span></a></li>
+>>>>>>> upstream/main
+            <li class="nav-menu-item"><a href="assessments.html?v=3"><span>Assessments</span></a></li>
+            <li class="nav-menu-item"><a href="reports.html?v=3"><span>Reports</span></a></li>
+            <li class="nav-menu-item"><a href="dashboard.html?v=3"><span>Dashboard</span></a></li>
+            <li class="nav-menu-item"><a href="departments.html?v=3"><span>Departments</span></a></li>
+            <li class="nav-menu-item"><a href="settings.html?v=3"><span>Settings</span></a></li>
+        </ul>
+        <div class="logout-container"><a href="#" class="logout-link"><span>Logout</span></a></div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+        <header class="header-actions">
+            <h1 class="page-title">All Candidates</h1>
+            <button class="btn-add" id="openModalBtn">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                Add Candidate
+            </button>
+        </header>
+
+        <section class="candidates-section">
+            <!-- FILTER AND SEARCH BAR -->
+            <div class="filter-bar">
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="searchName" placeholder="Search by candidate name...">
+                </div>
+                <div class="filter-group">
+                    <select id="filterDept" class="filter-select">
+                        <option value="all">All Departments</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Product">Product</option>
+                        <option value="Design">Design</option>
+                    </select>
+                    <select id="filterSubDept" class="filter-select">
+                        <option value="all">All Sub Departments</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend">Backend</option>
+                        <option value="Full Stack">Full Stack</option>
+                        <option value="QA / Testing">QA / Testing</option>
+                        <option value="UI/UX">UI/UX</option>
+                    </select>
+                    <select id="filterStage" class="filter-select">
+                        <option value="all">All Stages</option>
+                        <option value="Video Screening Pending">Video Screening Pending</option>
+                        <option value="Video Screening Completed">Video Screening Completed</option>
+                        <option value="MCQ Assessment Pending">MCQ Assessment Pending</option>
+                        <option value="MCQ Assessment Completed">MCQ Assessment Completed</option>
+                        <option value="Tech Interview Pending">Tech Interview Pending</option>
+                        <option value="Tech Interview Completed">Tech Interview Completed</option>
+                        <option value="Hr Interview Pending">Hr Interview Pending</option>
+                        <option value="Hr Interview Completed">Hr Interview Completed</option>
+                        <option value="Report Generation Pending">Report Generation Pending</option>
+                        <option value="Report Generated">Report Generated</option>
+                    </select>
+                    <select id="filterStatus" class="filter-select">
+                        <option value="all">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Hired">Hired</option>
+                        <option value="Withdrawn">Withdrawn</option>
+                    </select>
+                </div>
+            </div>
+
+            
+
+            <!-- CANDIDATES TABLE -->
+            <table class="candidate-table" id="candidatesTable">
+                <thead>
+                    <tr>
+                        <th>Date Added</th>
+                        <th>Candidate Name</th>
+                        <th>Sub Dept</th>
+                        <th>Pipeline Stage</th>
+                        <th>ElastiCrew Resume</th>
+                        <th>Admin Status</th>
+                        <th style="text-align: right; padding-right: 24px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="candidateListBody">
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> upstream/main
+                    <tr class="candidate-row" data-name="Achyut Pancholi" data-dept="Engineering" data-subdept="Full Stack" data-stage="Video Screening Completed" data-status="Active" data-remarks="">
+                        <td><span class="timestamp-txt">2026-06-08</span></td>
+                        <td><strong>Achyut Pancholi</strong></td>
+                        <td>Full Stack</td>
+                        <td><span class="stage-tag shortlisted">Video Screening Completed</span></td>
+                        <td><span class="resume-tag">📄 Achyut_resume.pdf</span></td>
+                        <td>
+                            <div class="status-select-wrapper">
+                                <select class="grid-status-dropdown status-active" onchange="updateRowStatusStyle(this)">
+                                    <option value="Active" selected>Active</option><option value="On Hold">On Hold</option><option value="Rejected">Rejected</option><option value="Hired">Hired</option><option value="Withdrawn">Withdrawn</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td style="text-align: right; padding-right: 24px;">
+                            <select class="action-dropdown" onchange="handleAction(this)">
+                                <option value="" disabled selected>Manage</option>
+                                <option value="video">Send Video Bot Invite</option>
+                                <option value="mcq">Send MCQ Assessment Invite</option>
+                                <option value="tech">Send Technical Interview Invite</option>
+                                <option value="hr">Send HR Interview Invite</option>
+                                <option value="delete" class="danger-option">Delete Candidate</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="candidate-row" data-name="Alan Turing" data-dept="Engineering" data-subdept="Backend" data-stage="Video Screening Pending" data-status="Active" data-remarks="">
+                        <td><span class="timestamp-txt">2026-06-01</span></td>
+                        <td><strong>Alan Turing</strong></td>
+                        <td>Backend</td>
+                        <td><span class="stage-tag screening">Video Screening Pending</span></td>
+                        <td><span class="resume-tag">📄 Alan_Turing_resume.pdf</span></td>
+                        <td>
+                            <div class="status-select-wrapper">
+                                <select class="grid-status-dropdown status-active" onchange="updateRowStatusStyle(this)">
+                                    <option value="Active" selected>Active</option><option value="On Hold">On Hold</option><option value="Rejected">Rejected</option><option value="Hired">Hired</option><option value="Withdrawn">Withdrawn</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td style="text-align: right; padding-right: 24px;">
+                            <select class="action-dropdown" onchange="handleAction(this)">
+                                <option value="" disabled selected>Manage</option>
+                                <option value="video">Send Video Bot Invite</option>
+                                <option value="mcq">Send MCQ Assessment Invite</option>
+                                <option value="tech">Send Technical Interview Invite</option>
+                                <option value="hr">Send HR Interview Invite</option>
+                                <option value="delete" class="danger-option">Delete Candidate</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="candidate-row" data-name="Grace Hopper" data-dept="Engineering" data-subdept="Full Stack" data-stage="Tech Interview Completed" data-status="Active" data-remarks="">
+                        <td><span class="timestamp-txt">2026-05-28</span></td>
+                        <td><strong>Grace Hopper</strong></td>
+                        <td>Full Stack</td>
+                        <td><span class="stage-tag shortlisted">Tech Interview Completed</span></td>
+                        <td><span class="resume-tag">📄 Grace_Hopper_resume.pdf</span></td>
+                        <td>
+                            <div class="status-select-wrapper">
+                                <select class="grid-status-dropdown status-active" onchange="updateRowStatusStyle(this)">
+                                    <option value="Active" selected>Active</option><option value="On Hold">On Hold</option><option value="Rejected">Rejected</option><option value="Hired">Hired</option><option value="Withdrawn">Withdrawn</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td style="text-align: right; padding-right: 24px;">
+                            <select class="action-dropdown" onchange="handleAction(this)">
+                                <option value="" disabled selected>Manage</option>
+                                <option value="video">Send Video Bot Invite</option>
+                                <option value="mcq">Send MCQ Assessment Invite</option>
+                                <option value="tech">Send Technical Interview Invite</option>
+                                <option value="hr">Send HR Interview Invite</option>
+                                <option value="delete" class="danger-option">Delete Candidate</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="candidate-row" data-name="Ada Lovelace" data-dept="Engineering" data-subdept="Frontend" data-stage="Video Screening Pending" data-status="Rejected" data-remarks="">
+                        <td><span class="timestamp-txt">2026-05-15</span></td>
+                        <td><strong>Ada Lovelace</strong></td>
+                        <td>Frontend</td>
+                        <td><span class="stage-tag screening">Video Screening Pending</span></td>
+                        <td><span class="resume-tag">📄 Ada_Lovelace_resume.pdf</span></td>
+                        <td>
+                            <div class="status-select-wrapper">
+                                <select class="grid-status-dropdown status-rejected" onchange="updateRowStatusStyle(this)">
+                                    <option value="Active">Active</option><option value="On Hold">On Hold</option><option value="Rejected" selected>Rejected</option><option value="Hired">Hired</option><option value="Withdrawn">Withdrawn</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td style="text-align: right; padding-right: 24px;">
+                            <select class="action-dropdown" onchange="handleAction(this)">
+                                <option value="" disabled selected>Manage</option>
+                                <option value="video">Send Video Bot Invite</option>
+                                <option value="mcq">Send MCQ Assessment Invite</option>
+                                <option value="tech">Send Technical Interview Invite</option>
+                                <option value="hr">Send HR Interview Invite</option>
+                                <option value="delete" class="danger-option">Delete Candidate</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="candidate-row" data-name="Linus Torvalds" data-dept="Engineering" data-subdept="Backend" data-stage="Video Screening Pending" data-status="Withdrawn" data-remarks="">
+                        <td><span class="timestamp-txt">2026-05-20</span></td>
+                        <td><strong>Linus Torvalds</strong></td>
+                        <td>Backend</td>
+                        <td><span class="stage-tag screening">Video Screening Pending</span></td>
+                        <td><span class="resume-tag">📄 Linus_Torvalds_resume.pdf</span></td>
+                        <td>
+                            <div class="status-select-wrapper">
+                                <select class="grid-status-dropdown status-withdrawn" onchange="updateRowStatusStyle(this)">
+                                    <option value="Active">Active</option><option value="On Hold">On Hold</option><option value="Rejected">Rejected</option><option value="Hired">Hired</option><option value="Withdrawn" selected>Withdrawn</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td style="text-align: right; padding-right: 24px;">
+                            <select class="action-dropdown" onchange="handleAction(this)">
+                                <option value="" disabled selected>Manage</option>
+                                <option value="video">Send Video Bot Invite</option>
+                                <option value="mcq">Send MCQ Assessment Invite</option>
+                                <option value="tech">Send Technical Interview Invite</option>
+                                <option value="hr">Send HR Interview Invite</option>
+                                <option value="delete" class="danger-option">Delete Candidate</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="candidate-row" data-name="Margaret Hamilton" data-dept="Sales" data-subdept="Account Executive" data-stage="Tech Interview Pending" data-status="Active" data-remarks="">
+                        <td><span class="timestamp-txt">2026-06-05</span></td>
+                        <td><strong>Margaret Hamilton</strong></td>
+                        <td>Account Executive</td>
+                        <td><span class="stage-tag screening">Tech Interview Pending</span></td>
+                        <td><span class="resume-tag">📄 Margaret_Hamilton_resume.pdf</span></td>
+                        <td>
+                            <div class="status-select-wrapper">
+                                <select class="grid-status-dropdown status-active" onchange="updateRowStatusStyle(this)">
+                                    <option value="Active" selected>Active</option><option value="On Hold">On Hold</option><option value="Rejected">Rejected</option><option value="Hired">Hired</option><option value="Withdrawn">Withdrawn</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td style="text-align: right; padding-right: 24px;">
+                            <select class="action-dropdown" onchange="handleAction(this)">
+                                <option value="" disabled selected>Manage</option>
+                                <option value="video">Send Video Bot Invite</option>
+                                <option value="mcq">Send MCQ Assessment Invite</option>
+                                <option value="tech">Send Technical Interview Invite</option>
+                                <option value="hr">Send HR Interview Invite</option>
+                                <option value="delete" class="danger-option">Delete Candidate</option>
+                            </select>
+                        </td>
+                    </tr>
+<<<<<<< HEAD
+=======
+=======
+                    
+                    
+>>>>>>> b176ff6 (Added resume upload, parsing, Supabase integration and API connection)
+>>>>>>> upstream/main
+                </tbody>
+            </table>
+            <div id="noResults" class="empty-state" style="display: none;">No candidates found in this view context.</div>
+        </section>
+    </main>
+
+    <!-- MODAL 1: ADD CANDIDATE MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-card">
+            <h2 class="modal-header">Add New Candidate</h2>
+            <form id="candidateForm">
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" class="form-control" required>
+                        <option value="" disabled selected>Select Department</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Product">Product</option>
+                        <option value="Design">Design</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="subDepartment">Sub Department</label>
+                    <select id="subDepartment" class="form-control" required>
+                        <option value="" disabled selected>Select Sub Department</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend">Backend</option>
+                        <option value="Full Stack">Full Stack</option>
+                        <option value="QA / Testing">QA / Testing</option>
+                        <option value="UI/UX">UI/UX</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resume">Upload Resume</label>
+                    <input type="file" id="resume" class="form-control" accept=".pdf,.doc,.docx" required>
+                </div>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+                <div id="uploadStatusMessage" class="upload-status-message"></div>
+>>>>>>> b176ff6 (Added resume upload, parsing, Supabase integration and API connection)
+>>>>>>> upstream/main
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="closeModalBtn">Cancel</button>
+                    <button type="submit" class="btn-submit">Add Candidate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: WIDENED SINGLE-SCROLL EMAIL INVITATION MODAL WITH REMARKS -->
+    <div class="modal-overlay" id="emailModalOverlay">
+        <div class="modal-card email-modal-card">
+            <h2 class="modal-header" style="margin:0; padding-bottom:10px; border-bottom:1px solid #e2e8f0; font-size:16px;">Video Bot screening Invitation</h2>
+            
+            <form id="emailInviteForm" class="modal-scrollable-form">
+                <div class="form-group">
+                    <label for="senderEmail">Sender</label>
+                    <input type="email" id="senderEmail" class="form-control" value="hr@elasticrew.com" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="candidateEmail">Candidate Email</label>
+                    <input type="email" id="candidateEmail" class="form-control" readonly>
+                </div>
+
+                <!-- INTEGRATION ENGINE: DROPDOWN PICKER -->
+                <div class="form-group">
+                    <label for="inviteQuestionSetSelect">Select Target Question Set</label>
+                    <select id="inviteQuestionSetSelect" class="form-control" required onchange="updateInviteQuestionSetTicker()">
+                        <!-- Dynamic options injected here -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailSubject">Subject</label>
+                    <input type="text" id="emailSubject" class="form-control" value="Action Required: Complete your Video Screening with ElastiCrew" required>
+                </div>
+                <div class="form-group">
+                    <label for="emailBody">Email Message Body</label>
+                    <textarea id="emailBody" class="form-control textarea-body" required></textarea>
+                </div>
+
+                <!-- NEW COMPONENT: ADMINISTRATIVE ACTION REMARKS INPUT -->
+                <div class="form-group">
+                    <label for="emailRemarks">Administrative Candidate Remarks</label>
+                    <textarea id="emailRemarks" class="form-control textarea-remarks" placeholder="Type internal notes, context, or screening considerations for this candidate profile..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="closeEmailModalBtn" style="padding:6px 14px; font-size:12px;">Cancel</button>
+                    <button type="submit" class="btn-submit dispatch-btn" style="padding:6px 14px; font-size:12px;">Send Invite</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Runtime Synchronization Engine -->
+    <script>
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const candidateForm = document.getElementById('candidateForm');
+        const candidateListBody = document.getElementById('candidateListBody');
+        const noResults = document.getElementById('noResults');
+        const totalCountBubble = document.getElementById('totalCountBubble');
+
+        const emailModalOverlay = document.getElementById('emailModalOverlay');
+        const closeEmailModalBtn = document.getElementById('closeEmailModalBtn');
+        const emailInviteForm = document.getElementById('emailInviteForm');
+        const candidateEmailInput = document.getElementById('candidateEmail');
+        const emailBodyTextArea = document.getElementById('emailBody');
+        const emailRemarksTextArea = document.getElementById('emailRemarks');
+        const inviteQuestionSetSelect = document.getElementById('inviteQuestionSetSelect');
+
+        const searchName = document.getElementById('searchName');
+        const filterDept = document.getElementById('filterDept');
+        const filterSubDept = document.getElementById('filterSubDept');
+        const filterStage = document.getElementById('filterStage');
+        const filterStatus = document.getElementById('filterStatus');
+
+        let currentIdCounter = 2;
+        let activeRowForEmail = null;
+
+<<<<<<< HEAD
+=======
+        const API_BASE_URL = "http://127.0.0.1:8000";
+
+
+>>>>>>> upstream/main
+        const baselineFallbackDatabase = {
+            "Operations|HR|Fresher(0)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Operations|HR|Junior(1-3)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Operations|HR|Mid Level(3-5)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Operations|HR|Senior(5+)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Operations|HR|Lead(10+)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5", "Question 6", "Question 7", "Question 8"],
+            "Engineering|Full Stack|Fresher(0)": ["Question 1", "Question 2", "Question 3"],
+            "Engineering|Full Stack|Junior(1-3)": ["Question 1", "Question 2", "Question 3"],
+            "Engineering|Full Stack|Mid Level(3-5)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Engineering|Full Stack|Senior(5+)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"],
+            "Engineering|Full Stack|Lead(10+)": ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5", "Question 6", "Question 7", "Question 8"]
+        };
+
+        function updateRowStatusStyle(selectEl) {
+            selectEl.classList.remove('status-active', 'status-onhold', 'status-rejected', 'status-hired', 'status-withdrawn');
+            const val = selectEl.value;
+            if (val === 'Active') selectEl.classList.add('status-active');
+            else if (val === 'On Hold') selectEl.classList.add('status-onhold');
+            else if (val === 'Rejected') selectEl.classList.add('status-rejected');
+            else if (val === 'Hired') selectEl.classList.add('status-hired');
+            else if (val === 'Withdrawn') selectEl.classList.add('status-withdrawn');
+            
+            const row = selectEl.closest('.candidate-row');
+            if (row) row.setAttribute('data-status', val);
+        }
+
+        function populateDynamicQuestionDropdown() {
+            let currentPools = localStorage.getItem('elasticrew_question_matrix');
+            if(!currentPools) {
+                localStorage.setItem('elasticrew_question_matrix', JSON.stringify(baselineFallbackDatabase));
+                currentPools = JSON.stringify(baselineFallbackDatabase);
+            }
+            
+            const database = JSON.parse(currentPools);
+            inviteQuestionSetSelect.innerHTML = '<option value="" disabled selected>Select configuration pool...</option>';
+            
+            Object.keys(database).forEach(key => {
+                const [dept, subdept, exp] = key.split('|');
+                const count = database[key].length;
+                
+                const optionNode = document.createElement('option');
+                optionNode.value = key;
+                optionNode.setAttribute('data-count', count);
+                optionNode.textContent = `${dept} - ${subdept} (${exp})`;
+                
+                inviteQuestionSetSelect.appendChild(optionNode);
+            });
+        }
+
+        function toggleModal(show) {
+            if (show) modalOverlay.classList.add('active');
+            else { modalOverlay.classList.remove('active'); candidateForm.reset(); }
+        }
+        
+        function toggleEmailModal(show) {
+            if (show) {
+                populateDynamicQuestionDropdown();
+                emailModalOverlay.classList.add('active');
+            } else { 
+                emailModalOverlay.classList.remove('active'); 
+                emailInviteForm.reset(); 
+                activeRowForEmail = null; 
+            }
+        }
+
+        openModalBtn.addEventListener('click', () => toggleModal(true));
+        closeModalBtn.addEventListener('click', () => toggleModal(false));
+        closeEmailModalBtn.addEventListener('click', () => toggleEmailModal(false));
+
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) toggleModal(false); });
+        emailModalOverlay.addEventListener('click', (e) => { if (e.target === emailModalOverlay) toggleEmailModal(false); });
+
+        function cleanNameFromFilename(filename) {
+            let name = filename.substring(0, filename.lastIndexOf('.')) || filename;
+            name = name.replace(/[-_]/g, ' ');
+            name = name.replace(/\b(resume|cv|file|update|eng|design|job)\b/gi, '');
+            return name.replace(/\s+/g, ' ').trim().replace(/\b\w/g, c => c.toUpperCase()) || "New Candidate";
+        }
+
+        function filterCandidates() {
+            const query = searchName.value.toLowerCase().trim();
+            const deptValue = filterDept.value;
+            const subDeptValue = filterSubDept.value;
+            const stageValue = filterStage.value;
+            const statusValue = filterStatus.value;
+            const rows = candidateListBody.getElementsByClassName('candidate-row');
+            
+            let visibleCount = 0;
+            totalCountBubble.innerText = rows.length;
+
+            for (let row of rows) {
+                const name = row.getAttribute('data-name').toLowerCase();
+                const dept = row.getAttribute('data-dept');
+                const subdept = row.getAttribute('data-subdept');
+                const stage = row.getAttribute('data-stage');
+                const status = row.getAttribute('data-status');
+
+                const matchesSearch = name.includes(query);
+                const matchesDept = (deptValue === 'all' || dept === deptValue);
+                const matchesSubDept = (subDeptValue === 'all' || subdept === subDeptValue);
+                const matchesStage = (stageValue === 'all' || stage === stageValue);
+                const matchesStatus = (statusValue === 'all' || status === statusValue);
+
+                if (matchesSearch && matchesDept && matchesSubDept && matchesStage && matchesStatus) { 
+                    row.style.display = ''; 
+                    visibleCount++; 
+                } else { 
+                    row.style.display = 'none'; 
+                }
+            }
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        searchName.addEventListener('input', filterCandidates);
+        filterDept.addEventListener('change', filterCandidates);
+        filterSubDept.addEventListener('change', filterCandidates);
+        filterStage.addEventListener('change', filterCandidates);
+        filterStatus.addEventListener('change', filterCandidates);
+
+        function updateInviteQuestionSetTicker() {
+            const selectedOpt = inviteQuestionSetSelect.options[inviteQuestionSetSelect.selectedIndex];
+            if(selectedOpt && selectedOpt.value !== "") {
+                const count = selectedOpt.getAttribute('data-count');
+                const candName = activeRowForEmail ? activeRowForEmail.getAttribute('data-name') : "Candidate";
+                emailBodyTextArea.value = `Hi ${candName},\n\nPlease complete your Video Screening assessment configured for the ${selectedOpt.text}.\n\nThis workflow features exactly ${count} targeted question blocks. Complete it using the secure link inside your tracking workspace.\n\nBest regards,\nElastiCrew Management`;
+                
+                // Fetch and populate existing candidate context remarks if previously saved
+                if (activeRowForEmail) {
+                    emailRemarksTextArea.value = activeRowForEmail.getAttribute('data-remarks') || "";
+                }
+            }
+        }
+
+        function handleAction(dropdown) {
+            const selectedAction = dropdown.value;
+            const row = dropdown.closest('.candidate-row');
+            if (!row) return;
+            const candidateName = row.getAttribute('data-name');
+            const candidateSubDept = row.getAttribute('data-subdept');
+
+            if (selectedAction === 'delete') {
+                if (confirm(`Are you sure you want to completely delete ${candidateName}?`)) {
+                    row.remove();
+                    filterCandidates();
+                }
+                dropdown.value = "";
+            } 
+            else if (selectedAction === 'video') {
+                activeRowForEmail = row;
+                const parsedEmail = `${candidateName.toLowerCase().replace(/\s+/g, '.')}@example.com`;
+                candidateEmailInput.value = parsedEmail;
+                
+                toggleEmailModal(true);
+                
+                if(candidateSubDept === "Full Stack") {
+                    inviteQuestionSetSelect.value = "Engineering|Full Stack|Junior(1-3)";
+                } else {
+                    inviteQuestionSetSelect.value = "Operations|HR|Fresher(0)";
+                }
+                
+                updateInviteQuestionSetTicker();
+                dropdown.value = "";
+            }
+            else if (selectedAction !== "") {
+                alert(`Invite dispatched for "${dropdown.options[dropdown.selectedIndex].text}" to ${candidateName}.`);
+                dropdown.value = "";
+            }
+        }
+
+        emailInviteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (activeRowForEmail) {
+                const selectedOpt = inviteQuestionSetSelect.options[inviteQuestionSetSelect.selectedIndex];
+                const remarksValue = emailRemarksTextArea.value.trim();
+                
+                // Sync form notes context seamlessly back into row attribute structures
+                activeRowForEmail.setAttribute('data-remarks', remarksValue);
+                activeRowForEmail.setAttribute('data-stage', 'Video Screening Pending');
+                
+                activeRowForEmail.cells[3].innerHTML = `<span class="stage-tag screening">Video Screening Pending</span>`;
+                alert(`Video Bot Invite Dispatched Successfully!\nQuestion Set Matrix Attached: ${selectedOpt.text}\nRemarks cached safely.`);
+                toggleEmailModal(false);
+                filterCandidates();
+            }
+        });
+
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
+        candidateForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const dept = document.getElementById('department').value;
+            const subDept = document.getElementById('subDepartment').value;
+            const resumeFile = document.getElementById('resume').files[0];
+
+            if (!resumeFile) return;
+
+            const computedName = cleanNameFromFilename(resumeFile.name);
+            const defaultStage = 'Video Screening Pending';
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const currentTimestamp = `${year}-${month}-${day}`;
+
+            const newRow = document.createElement('tr');
+            newRow.className = 'candidate-row';
+            newRow.setAttribute('data-name', computedName);
+            newRow.setAttribute('data-dept', dept); 
+            newRow.setAttribute('data-subdept', subDept); 
+            newRow.setAttribute('data-stage', defaultStage);
+            newRow.setAttribute('data-status', 'Active');
+            newRow.setAttribute('data-remarks', '');
+
+            newRow.innerHTML = `
+                <td><span class="timestamp-txt">${currentTimestamp}</span></td>
+                <td><strong>${computedName}</strong></td>
+                <td>${subDept}</td>
+                <td><span class="stage-tag screening">Video Screening Pending</span></td>
+                <td><span class="resume-tag">📄 ${resumeFile.name}</span></td>
+                <td>
+                    <div class="status-select-wrapper">
+                        <select class="grid-status-dropdown status-active" onchange="updateRowStatusStyle(this)">
+                            <option value="Active" selected>Active</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Hired">Hired</option>
+                            <option value="Withdrawn">Withdrawn</option>
+                        </select>
+                    </div>
+                </td>
+                <td style="text-align: right; padding-right: 24px;">
+                    <select class="action-dropdown" onchange="handleAction(this)">
+                        <option value="" disabled selected>Manage</option>
+                        <option value="video">Send Video Bot Invite</option>
+                        <option value="mcq">Send MCQ Assessment Invite</option>
+                        <option value="tech">Send Technical Interview Invite</option>
+                        <option value="hr">Send HR Interview Invite</option>
+                        <option value="delete" class="danger-option">Delete Candidate</option>
+                    </select>
+                </td>
+            `;
+
+            candidateListBody.appendChild(newRow);
+            toggleModal(false);
+            filterCandidates();
+        });
+<<<<<<< HEAD
+=======
+        candidateForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const dept = document.getElementById('department').value;
+            const subDept = document.getElementById('subDepartment').value;
+            const resumeFile = document.getElementById('resume').files[0];
+            const allowedExtensions = [
+                "pdf",
+                "doc",
+                "docx"
+            ];
+
+            const extension =
+                resumeFile.name
+                    .split('.')
+                    .pop()
+                    .toLowerCase();
+
+            if (!allowedExtensions.includes(extension)) {
+
+                uploadStatusMessage.className =
+                    "upload-status-message upload-error";
+
+                uploadStatusMessage.textContent =
+                    "Only PDF, DOC and DOCX files are allowed.";
+
+                return;
+            }
+
+            if (resumeFile.size > 5 * 1024 * 1024) {
+
+                uploadStatusMessage.className =
+                    "upload-status-message upload-error";
+
+                uploadStatusMessage.textContent =
+                    "Maximum file size is 5MB.";
+
+                return;
+            }
+
+            if (!resumeFile) {
+                alert("Please upload a resume");
+                return;
+            }
+
+            const candidateName = cleanNameFromFilename(resumeFile.name);
+
+            const formData = new FormData();
+
+            formData.append("name", candidateName);
+            formData.append("email", `${candidateName.replace(/\s+/g,'.').toLowerCase()}@example.com`);
+            formData.append("phone", "9999999999");
+            formData.append("department", dept);
+            formData.append("sub_department", subDept);
+            formData.append("resume", resumeFile);
+
+            try {
+
+                const response = await fetch(
+                    `${API_BASE_URL}/candidates/create-with-resume`,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.detail || "Upload failed");
+                }
+
+                alert("Candidate added successfully!");
+
+                candidateForm.reset();
+
+                toggleModal(false);
+
+                loadCandidates();
+
+            } catch(error) {
+
+                console.error(error);
+
+                alert(error.message);
+            }
+        });
+        async function loadCandidates() {
+
+            try {
+
+                const response = await fetch(
+                    `${API_BASE_URL}/candidates`
+                );
+
+                const candidates = await response.json();
+
+                candidateListBody.innerHTML = "";
+
+                candidates.forEach(candidate => {
+
+                    const date = candidate.created_at
+                        ? candidate.created_at.split("T")[0]
+                        : new Date().toISOString().split("T")[0];
+
+                    const row = document.createElement("tr");
+
+                    row.className = "candidate-row";
+
+                    row.setAttribute(
+                        "data-name",
+                        candidate.name
+                    );
+
+                    row.setAttribute(
+                        "data-dept",
+                        candidate.department
+                    );
+
+                    row.setAttribute(
+                        "data-subdept",
+                        candidate.sub_department
+                    );
+
+                    row.innerHTML = `
+                        <td>
+                            <span class="timestamp-txt">
+                                ${date}
+                            </span>
+                        </td>
+
+                        <td>
+                            <strong>${candidate.name}</strong>
+                        </td>
+
+                        <td>
+                            ${candidate.sub_department}
+                        </td>
+
+                        <td>
+                            <span class="stage-tag screening">
+                                ${candidate.pipeline_stage}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="resume-tag">
+                                📄 ${candidate.resume_filename || "N/A"}
+                            </span>
+                        </td>
+
+                        <td>
+                            ${candidate.status}
+                        </td>
+
+                        <td>
+                            Backend Connected
+                        </td>
+                    `;
+
+                    candidateListBody.appendChild(row);
+
+                });
+
+            } catch(error) {
+
+                console.error(error);
+
+                alert("Failed to load candidates");
+            }
+        }
+        loadCandidates();
+
+>>>>>>> upstream/main
+
+        filterCandidates();
+    </script>
+</body>
+</html>

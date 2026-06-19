@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElastiCrew - Resume Queue</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .enterprise-table td strong {
+            white-space: normal !important;
+            max-width: none !important;
+            line-height: 1.3;
+        }
+        .enterprise-table td {
+            vertical-align: middle !important;
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
+        }
+        .enterprise-table th:first-child,
+        .enterprise-table td:first-child {
+            padding-left: 24px !important;
+        }
+        .timestamp-txt {
+            font-family: monospace;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .pipeline-stepper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+            border: 1px solid #f1f5f9;
+            justify-content: space-between;
+            position: relative;
+        }
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            position: relative;
+            z-index: 2;
+        }
+        .pipeline-step svg { color: #94a3b8; transition: all 0.4s ease; }
+        .pipeline-step.active {
+            background: var(--primary-blue) !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 16px rgba(14, 45, 123, 0.3);
+        }
+        .pipeline-step.active svg { color: #ffffff !important; }
+        .pipeline-step:not(.active):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+        .step-connector {
+            flex: 1;
+            height: 4px;
+            background: #e2e8f0;
+            margin: 0 -15px;
+            z-index: 1;
+            border-radius: 2px;
+        }
+        /* Resume preview modal */
+        .resume-modal-backdrop {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+        .resume-modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .resume-modal-card {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 62vw;
+            max-width: 860px;
+            max-height: 88vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+        }
+        .resume-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        .resume-modal-body {
+            overflow-y: auto;
+            padding: 24px;
+            flex: 1;
+        }
+        /* Notes modal */
+        .notes-modal-card {
+            max-width: 460px;
+            width: 90%;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+        }
+        .notes-textarea {
+            width: 100%;
+            height: 130px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 13px;
+            color: #1e293b;
+            resize: none;
+            background: #f8fafc;
+            box-sizing: border-box;
+            font-family: inherit;
+            margin-bottom: 14px;
+            transition: all 0.12s ease;
+        }
+        .notes-textarea:focus { background: #fff; border-color: #2563eb; outline: none; }
+        /* Resume info blocks inside modal */
+        .rv-info-row-m {
+            display: flex; align-items: flex-start; gap: 10px;
+            font-size: 12.5px; padding: 7px 0;
+            border-bottom: 1px solid #f8fafc;
+        }
+        .rv-info-row-m:last-child { border-bottom: none; }
+        .rv-info-label-m {
+            color: #94a3b8; font-weight: 700; min-width: 130px;
+            font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .rv-info-value-m { color: #1e293b; font-weight: 500; }
+        .rv-badge-m {
+            background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe;
+            font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px;
+        }
+        .rv-timeline-m {
+            border-left: 3px solid #e2e8f0;
+            padding-left: 12px; margin-bottom: 12px;
+        }
+        .rv-section-title-m {
+            font-size: 10.5px; font-weight: 800; color: #1e3a8a;
+            text-transform: uppercase; letter-spacing: 0.6px;
+            border-bottom: 1px solid #f1f5f9; padding-bottom: 6px;
+            margin: 16px 0 10px;
+        }
+        .rv-section-title-m:first-child { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sidebar-header"><h1 class="sidebar-brand">ElastiCrew</h1></div>
+        <ul class="nav-menu">
+            <li class="nav-menu-item"><a href="hiring-queue.html?v=3"><span>Hiring Queue</span></a></li>
+            <li class="nav-menu-item"><a href="all-candidates.html?v=3"><span>All Candidates</span></a></li>
+            <li class="nav-menu-item"><a href="assessments.html?v=3"><span>Assessments</span></a></li>
+            <li class="nav-menu-item"><a href="reports.html?v=3"><span>Reports</span></a></li>
+            <li class="nav-menu-item active"><a href="resume-queue.html"><span>Resume Queue</span></a></li>
+            <li class="nav-menu-item"><a href="resume-view.html"><span>View Resume</span></a></li>
+            <li class="nav-menu-item"><a href="departments.html?v=3"><span>Departments</span></a></li>
+            <li class="nav-menu-item"><a href="settings.html?v=3"><span>Settings</span></a></li>
+        </ul>
+        <div class="logout-container"><a href="#" class="logout-link"><span>Logout</span></a></div>
+    </nav>
+
+    <main class="main-content" style="padding: 24px 40px !important;">
+
+        <!-- Breadcrumb label -->
+        <div style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.8px;">Pipeline Stages</div>
+
+        <!-- Pipeline stepper -->
+        <div class="pipeline-stepper">
+            <a href="hiring-queue.html?v=3" class="pipeline-step">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                <span>Video Bot Screening</span>
+            </a>
+            <div class="step-connector"></div>
+            <a href="resume-queue.html" class="pipeline-step active">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Resume Queue</span>
+            </a>
+            <div class="step-connector"></div>
+            <a href="tech-scheduler.html?v=3" class="pipeline-step">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>Tech Scheduler</span>
+            </a>
+            <div class="step-connector"></div>
+            <a href="#" class="pipeline-step">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>HR Interview</span>
+            </a>
+        </div>
+        <!-- Page header -->
+        <header class="header-actions" style="margin-bottom: 16px;">
+            <div>
+                <h1 class="page-title">Resume Review Operations Workspace</h1>
+                <p style="color: #64748b; font-size: 14px; margin-top: 6px;">Review submitted resumes and move qualified candidates to the next pipeline stage.</p>
+            </div>
+        </header>
+
+        <!-- KPI Panel -->
+        <section class="kpi-panel-container" style="margin-bottom: 20px;">
+            <div class="kpi-card warning">
+                <div class="kpi-label">Upload Pending</div>
+                <div class="kpi-count" id="kpi-upload-pending">2</div>
+            </div>
+            <div class="kpi-card danger">
+                <div class="kpi-label">Upload Overdue</div>
+                <div class="kpi-count" id="kpi-upload-overdue">1</div>
+            </div>
+            <div class="kpi-card neutral">
+                <div class="kpi-label">Uploaded</div>
+                <div class="kpi-count" id="kpi-request-sent">2</div>
+            </div>
+            <div class="kpi-card orange">
+                <div class="kpi-label">Incomplete Resume</div>
+                <div class="kpi-count" id="kpi-incomplete">1</div>
+            </div>
+            <div class="kpi-card teal">
+                <div class="kpi-label">Awaiting Review</div>
+                <div class="kpi-count" id="kpi-awaiting-review">3</div>
+            </div>
+            <div class="kpi-card neutral" style="border-left-color: #64748b;">
+                <div class="kpi-label">On Hold</div>
+                <div class="kpi-count" id="kpi-on-hold">1</div>
+            </div>
+        </section>
+
+        <section class="candidates-section">
+
+            <!-- ── PENDING QUEUE ── -->
+            <div style="margin-top: 30px; margin-bottom: 12px; padding-left: 24px;">
+                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">
+                    Pending Queue
+                    <span id="pending-queue-count" style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">4</span>
+                </h2>
+                <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates who have not yet submitted their resume or whose upload is overdue.</p>
+            </div>
+
+            <div class="table-responsive-wrapper">
+                <table class="candidate-table enterprise-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">Candidate ID</th>
+                            <th style="width: 20%;">Name</th>
+                            <th style="width: 15%;">Sub Dept.</th>
+                            <th style="width: 12%;">Request Date</th>
+                            <th style="width: 15%;">Candidate Status</th>
+                            <th style="width: 10%; text-align: center;">HR Notes</th>
+                            <th style="width: 18%; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-queue-body">
+                    <!-- Pending Row 1 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1042</span></td>
+                            <td><div style="display:flex; align-items:center; gap:10px;"><div><strong>Alan Turing</strong></div></div></td>
+                            <td>Backend Eng</td>
+                            <td><div class="timestamp-txt">-</div></td>
+                            <td><span class="status-badge" style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">Upload Pending</span></td>
+                            <td style="text-align:center;">
+                                <button onclick="openNotesModal('Alan Turing', this)" style="width:36px; height:36px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end;">
+                                    <select class="filter-select" style="padding:6px 12px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background-color:#f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option>Send Upload Reminder</option>
+                                        <option>Extend Upload Deadline</option>
+                                        <option>Cancel Request</option>
+                                        <option>Skip Resume Stage</option>
+                                        <option>Mark as Withdrawn</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Pending Row 2 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1045</span></td>
+                            <td><div style="display:flex; align-items:center; gap:10px;"><div><strong>Ada Lovelace</strong></div></div></td>
+                            <td>Frontend Eng</td>
+                            <td><div class="timestamp-txt">02 Jun 2026</div></td>
+                            <td><span class="status-badge" style="background:#fee2e2; color:#b91c1c; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">Upload Overdue</span></td>
+                            <td style="text-align:center;">
+                                <button onclick="openNotesModal('Ada Lovelace', this)" style="width:36px; height:36px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end;">
+                                    <select class="filter-select" style="padding:6px 12px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background-color:#f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option>Send Upload Reminder</option>
+                                        <option>Extend Upload Deadline</option>
+                                        <option>Cancel Request</option>
+                                        <option>Skip Resume Stage</option>
+                                        <option>Mark as Withdrawn</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Pending Row 3 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1048</span></td>
+                            <td><div style="display:flex; align-items:center; gap:10px;"><div><strong>Margaret Hamilton</strong></div></div></td>
+                            <td>Systems Eng</td>
+                            <td><div class="timestamp-txt">11 Jun 2026</div></td>
+                            <td><span class="status-badge" style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">Request Sent</span></td>
+                            <td style="text-align:center;">
+                                <button onclick="openNotesModal('Margaret Hamilton', this)" style="width:36px; height:36px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end;">
+                                    <select class="filter-select" style="padding:6px 12px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background-color:#f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option>Send Upload Reminder</option>
+                                        <option>Extend Upload Deadline</option>
+                                        <option>Cancel Request</option>
+                                        <option>Skip Resume Stage</option>
+                                        <option>Mark as Withdrawn</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Pending Row 4 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1051</span></td>
+                            <td><div style="display:flex; align-items:center; gap:10px;"><div><strong>John von Neumann</strong></div></div></td>
+                            <td>Data Science</td>
+                            <td><div class="timestamp-txt">09 Jun 2026</div></td>
+                            <td><span class="status-badge" style="background:#ffedd5; color:#c2410c; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">Incomplete Resume</span></td>
+                            <td style="text-align:center;">
+                                <button onclick="openNotesModal('John von Neumann', this)" style="width:36px; height:36px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end;">
+                                    <select class="filter-select" style="padding:6px 12px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background-color:#f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option>Send Upload Reminder</option>
+                                        <option>Extend Upload Deadline</option>
+                                        <option>Cancel Request</option>
+                                        <option>Skip Resume Stage</option>
+                                        <option>Mark as Withdrawn</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ── REVIEW QUEUE ── -->
+            <div style="margin-top: 40px; margin-bottom: 12px; padding-left: 24px;">
+                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">
+                    Resume Review Queue
+                    <span id="review-queue-count" style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">4</span>
+                </h2>
+                <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates who have submitted their resume — awaiting review, on hold, or review completed.</p>
+            </div>
+
+            <div class="table-responsive-wrapper">
+                <table class="candidate-table enterprise-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">Candidate ID</th>
+                            <th style="width: 15%;">Name</th>
+                            <th style="width: 12%;">Sub Dept.</th>
+                            <th style="width: 10%;">Request Date</th>
+                            <th style="width: 10%;">Submitted On</th>
+                            <th style="width: 12%;">HR Review Status</th>
+                            <th style="width: 10%; text-align:center;">View Resume</th>
+                            <th style="width: 8%; text-align:center;">HR Notes</th>
+                            <th style="width: 15%; text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="review-queue-body">
+                    <!-- Review Row 1 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family:monospace; color:#64748b;">#C-1021</span></td>
+                            <td><div style="display:flex; align-items:center; gap:10px;"><div><strong>Grace Hopper</strong></div></div></td>
+                            <td>Engineering</td>
+                            <td><div class="timestamp-txt">01 Jun 2026</div></td>
+                            <td><div class="timestamp-txt" style="color:#0f172a; font-weight:500;">03 Jun 2026</div></td>
+                            <td><span class="status-badge" style="background:#e0f2fe; color:#0284c7; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">Awaiting Review</span></td>
+                            <td style="text-align:center;">
+                                <button onclick="openResumeModal('Grace Hopper','Engineering','Senior (5+ Y)','03 Jun 2026','Python, Django, FastAPI, PostgreSQL, AWS','B.S. Computer Science — Distributed Systems. Graduated 2019.','Senior Software Engineer at Tech Solutions Inc. (2021–Present): Architected async microservices pipelines. Backend Engineer at CloudBase (2019–2021): REST &amp; GraphQL APIs, 40% query optimization.')"
+                                    class="btn-primary-action" style="padding:6px 12px; font-weight:600; border:1px solid var(--primary-blue); background:#f0f9ff; color:var(--primary-blue);">View Resume</button>
+                            </td>
+                            <td style="text-align:center;">
+                                <button onclick="openNotesModal('Grace Hopper', this)" style="width:36px; height:36px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end;">
+                                    <select class="filter-select" style="padding:6px 12px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background-color:#f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option>Ready for Video Screening</option>
+                                        <option>Ready for Assessment</option>
+                                        <option>Ready for Tech Interview</option>
+                                        <option>On Hold</option>
+                                        <option>Reject</option>
+                                        <option>Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Review Row 2 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family:monospace; color:#64748b;">#C-1025</span></td>
+                            <td><div style="display:flex; align-items:center; gap:10px;"><div><strong>Charles Babbage</strong></div></div></td>
+                            <td>Hardware</td>
+                            <td><div class="timestamp-txt">28 May 2026</div></td>
+                            <td><div class="timestamp-txt" style="color:#0f172a; font-weight:500;">30 May 2026</div></td>
+                            <td><span class="status-badge" style="background:#dcfce7; color:#15803d; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">Review Completed</span></td>
+                            <td style="text-align:center;">
+                                <button onclick="openResumeModal('Charles Babbage','Hardware','Mid Level (3-5 Y)','30 May 2026','C++, VHDL, Embedded C, Linux, ARM, SPI/I2C','B.S. Electrical Engineering — Computer Architecture. Graduated 2020.','Hardware Engineer at Chip Design Co. (2020–Present): FPGA prototyping and firmware development for embedded sensor platforms.')"
+                                    class="btn-primary-action" style="padding:6px 12px; font-weight:600; border:1px solid var(--primary-blue); background:#f0f9ff; color:var(--primary-blue);">View Resume</button>
+                            </td>
+                            <td style="text-align:center;">
+                                <button onclick="openNotesModal('Charles Babbage', this)" style="width:36px; height:36px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end;">
+                                    <select class="filter-select" style="padding:6px 12px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background-color:#f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option>Ready for Video Screening</option>
+                                        <option>Ready for Assessment</option>
+                                        <option>Ready for Tech Interview</option>
+                                        <option>On Hold</option>
+                                        <option>Reject</option>
+                                        <option>Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Review Row 3 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family:monospace; color:#64748b;">#C-1029</span></td>
+                            <td><div style="display:flex; align-items:center; gap:10px;"><div><strong>Linus Torvalds</strong></div></div></td>
+                            <td>Product</td>
+                            <td><div class="timestamp-txt">25 May 2026</div></td>
+                            <td><div class="timestamp-txt" style="color:#0f172a; font-weight:500;">25 May 2026</div></td>
+                            <td><span class="status-badge" style="background:#e0f2fe; color:#0284c7; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">Awaiting Review</span></td>
+                            <td style="text-align:center;">
+                                <button onclick="openResumeModal('Linus Torvalds','Product','Senior (5+ Y)','25 May 2026','Linux Kernel, C, Git, JIRA, Confluence, Agile','B.S. Computer Science — Operating Systems. Graduated 2017.','Product Lead at Open Source Ventures (2019–Present): Led cross-functional teams shipping 3 major platform releases. Reduced bug backlog by 60% through process improvements.')"
+                                    class="btn-primary-action" style="padding:6px 12px; font-weight:600; border:1px solid var(--primary-blue); background:#f0f9ff; color:var(--primary-blue);">View Resume</button>
+                            </td>
+                            <td style="text-align:center;">
+                                <button onclick="openNotesModal('Linus Torvalds', this)" style="width:36px; height:36px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end;">
+                                    <select class="filter-select" style="padding:6px 12px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background-color:#f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option>Ready for Video Screening</option>
+                                        <option>Ready for Assessment</option>
+                                        <option>Ready for Tech Interview</option>
+                                        <option>On Hold</option>
+                                        <option>Reject</option>
+                                        <option>Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- Review Row 4 -->
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family:monospace; color:#64748b;">#C-1033</span></td>
+                            <td><div style="display:flex; align-items:center; gap:10px;"><div><strong>Tim Berners-Lee</strong></div></div></td>
+                            <td>Full Stack</td>
+                            <td><div class="timestamp-txt">18 May 2026</div></td>
+                            <td><div class="timestamp-txt" style="color:#0f172a; font-weight:500;">20 May 2026</div></td>
+                            <td><span class="status-badge" style="background:#f1f5f9; color:#475569; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">On Hold</span></td>
+                            <td style="text-align:center;">
+                                <button onclick="openResumeModal('Tim Berners-Lee','Full Stack','Mid Level (3-5 Y)','20 May 2026','React, Node.js, TypeScript, HTML, CSS, REST APIs, Docker','M.S. Computer Science — Web Systems. Graduated 2021.','Full Stack Engineer at WebCraft Ltd. (2021–Present): Built scalable web apps serving 500K+ monthly users. Previously Frontend Developer at Digital Agency (2018–2021).')"
+                                    class="btn-primary-action" style="padding:6px 12px; font-weight:600; border:1px solid var(--primary-blue); background:#f0f9ff; color:var(--primary-blue);">View Resume</button>
+                            </td>
+                            <td style="text-align:center;">
+                                <button onclick="openNotesModal('Tim Berners-Lee', this)" style="width:36px; height:36px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex; justify-content:flex-end;">
+                                    <select class="filter-select" style="padding:6px 12px; font-size:12px; border-radius:6px; border:1px solid #cbd5e1; background-color:#f8fafc;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option>Ready for Video Screening</option>
+                                        <option>Ready for Assessment</option>
+                                        <option>Ready for Tech Interview</option>
+                                        <option>On Hold</option>
+                                        <option>Reject</option>
+                                        <option>Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- ── RESUME PREVIEW MODAL ── -->
+    <div class="resume-modal-backdrop" id="resumeModalBackdrop">
+        <div class="resume-modal-card">
+            <div class="resume-modal-header">
+                <div>
+                    <div style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px;">Anonymized Resume</div>
+                    <h2 id="rmTitle" style="font-size:17px; font-weight:800; color:#0f172a; margin:0;">Candidate Resume</h2>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="display:inline-flex; align-items:center; gap:5px; background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:700;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        PII Redacted
+                    </span>
+                    <button onclick="closeResumeModal()" style="width:34px; height:34px; border-radius:8px; background:#f1f5f9; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="resume-modal-body">
+                <div class="rv-section-title-m">Role &amp; Details</div>
+                <div class="rv-info-row-m"><span class="rv-info-label-m">Department</span><span class="rv-info-value-m" id="rmDept">—</span></div>
+                <div class="rv-info-row-m"><span class="rv-info-label-m">Experience Level</span><span class="rv-info-value-m" id="rmExp">—</span></div>
+                <div class="rv-info-row-m"><span class="rv-info-label-m">Submitted On</span><span class="rv-info-value-m" id="rmDate">—</span></div>
+
+                <div class="rv-section-title-m">Tech Stack</div>
+                <div id="rmStack" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
+
+                <div class="rv-section-title-m">Education</div>
+                <p id="rmEdu" style="font-size:13px; color:#334155; line-height:1.5; margin:0;"></p>
+
+                <div class="rv-section-title-m">Work History</div>
+                <div id="rmWork" style="font-size:13px; color:#334155; line-height:1.6;"></div>
+            </div>
+            <div style="padding:14px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px; flex-shrink:0;">
+                <button onclick="closeResumeModal()" style="padding:8px 18px; border-radius:8px; background:#f1f5f9; border:1px solid #e2e8f0; font-size:13px; font-weight:600; color:#475569; cursor:pointer;">Close</button>
+                <a href="resume-view.html" style="padding:8px 18px; border-radius:8px; background:var(--primary-blue); border:none; font-size:13px; font-weight:600; color:#fff; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    Full Resume View
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── HR NOTES MODAL ── -->
+    <div class="modal-overlay" id="notesModalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.5); z-index:99998; align-items:center; justify-content:center;">
+        <div class="notes-modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div>
+                    <div style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">HR Notes</div>
+                    <h3 id="notesModalName" style="font-size:15px; font-weight:700; color:#0f172a; margin:4px 0 0;">Candidate</h3>
+                </div>
+                <button onclick="closeNotesModal()" style="width:32px; height:32px; border-radius:8px; background:#f1f5f9; border:1px solid #e2e8f0; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <textarea class="notes-textarea" id="notesTextarea" placeholder="Add HR notes for this candidate…"></textarea>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button onclick="closeNotesModal()" style="padding:8px 16px; border-radius:8px; background:#f1f5f9; border:1px solid #e2e8f0; font-size:13px; font-weight:600; color:#475569; cursor:pointer;">Cancel</button>
+                <button onclick="saveNotes()" style="padding:8px 18px; border-radius:8px; background:var(--primary-blue); border:none; font-size:13px; font-weight:600; color:#fff; cursor:pointer;">Save Notes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        // ── Notes modal ──
+        let activeNotesBtn = null;
+        let activeNotesId  = null;
+        const notesStore = {};
+
+        function openNotesModal(name, btn, candidateId) {
+            activeNotesBtn = btn;
+            activeNotesId  = candidateId || null;
+            document.getElementById('notesModalName').textContent = name;
+            document.getElementById('notesTextarea').value = notesStore[name] || '';
+            const overlay = document.getElementById('notesModalOverlay');
+            overlay.style.display = 'flex';
+        }
+        function closeNotesModal() {
+            document.getElementById('notesModalOverlay').style.display = 'none';
+            activeNotesBtn = null;
+            activeNotesId  = null;
+        }
+        async function saveNotes() {
+            const name = document.getElementById('notesModalName').textContent;
+            const val  = document.getElementById('notesTextarea').value.trim();
+            notesStore[name] = val;
+            if (activeNotesBtn) {
+                activeNotesBtn.querySelector('svg').setAttribute('stroke', val ? '#2563eb' : '#94a3b8');
+            }
+            // Persist to backend if we have a candidate id
+            if (activeNotesId) {
+                try { await ElastiCrewAPI.saveNotes(activeNotesId, val); }
+                catch (e) { console.warn('Could not save notes to backend:', e.message); }
+            }
+            closeNotesModal();
+        }
+
+        // ── Resume preview modal ──
+        function openResumeModal(candidateId, dept, exp, date, stack, edu, work) {
+            document.getElementById('rmTitle').textContent = dept + ' Candidate — Resume';
+            document.getElementById('rmDept').textContent = dept;
+            document.getElementById('rmExp').textContent = exp;
+            document.getElementById('rmDate').textContent = date || '—';
+            const stackArr = Array.isArray(stack) ? stack : String(stack).split(',');
+            document.getElementById('rmStack').innerHTML = stackArr.map(s =>
+                `<span class="rv-badge-m">${s.trim()}</span>`).join('');
+            document.getElementById('rmEdu').innerHTML = edu;
+            document.getElementById('rmWork').innerHTML = work;
+            document.getElementById('resumeModalBackdrop').classList.add('active');
+        }
+        function closeResumeModal() {
+            document.getElementById('resumeModalBackdrop').classList.remove('active');
+        }
+        document.getElementById('resumeModalBackdrop').addEventListener('click', function(e) {
+            if (e.target === this) closeResumeModal();
+        });
+
+        // ── Status change via workflow dropdown ───────────────────────────────
+        async function handleStatusChange(selectEl, candidateId) {
+            const newStatus = selectEl.value;
+            if (!newStatus) return;
+            try {
+                await ElastiCrewAPI.updateStatus(candidateId, newStatus);
+                await loadQueueFromAPI();
+            } catch (e) {
+                console.warn('Could not update status:', e.message);
+                selectEl.value = '';
+            }
+        }
+
+        // ── Status badge styling map ──────────────────────────────────────────
+        const STATUS_STYLES = {
+            'Upload Pending':    'background:#fef08a; color:#854d0e;',
+            'Request Sent':      'background:#e0f2fe; color:#0369a1;',
+            'Upload Overdue':    'background:#fee2e2; color:#b91c1c;',
+            'Incomplete Resume': 'background:#ffedd5; color:#c2410c;',
+            'Awaiting Review':   'background:#e0f2fe; color:#0284c7;',
+            'On Hold':           'background:#f1f5f9; color:#475569;',
+            'Review Completed':  'background:#dcfce7; color:#15803d;',
+            'Rejected':          'background:#fee2e2; color:#b91c1c;',
+            'Withdrawn':         'background:#f1f5f9; color:#64748b;',
+        };
+        function statusBadge(status) {
+            const s = STATUS_STYLES[status] || 'background:#f1f5f9; color:#64748b;';
+            return `<span style="${s} padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">${status}</span>`;
+        }
+
+        const PENDING_ACTIONS = `<option value="" disabled selected>Workflow Actions</option>
+            <option value="Request Sent">Send Upload Reminder</option>
+            <option value="Upload Pending">Extend Upload Deadline</option>
+            <option value="Withdrawn">Mark as Withdrawn</option>`;
+
+        const REVIEW_ACTIONS = `<option value="" disabled selected>Workflow Actions</option>
+            <option value="Awaiting Review">Ready for Video Screening</option>
+            <option value="Awaiting Review">Ready for Assessment</option>
+            <option value="Awaiting Review">Ready for Tech Interview</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Rejected">Reject</option>
+            <option value="Review Completed">Review Completed</option>`;
+
+        function buildPendingRow(c) {
+            return `<tbody class="candidate-row-group"><tr class="enterprise-row">
+              <td><span style="font-family:monospace;color:#64748b;">#${c.id}</span></td>
+              <td><strong>${c.role}</strong></td>
+              <td>${c.subdept}</td>
+              <td><div class="timestamp-txt">${c.resumeRequestDate || '—'}</div></td>
+              <td>${statusBadge(c.resumeStatus)}</td>
+              <td style="text-align:center;"><button onclick="openNotesModal('${c.role} (${c.id})',this,'${c.id}')"
+                style="width:36px;height:36px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${c.hrNotes ? '#2563eb' : '#94a3b8'}" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </button></td>
+              <td style="text-align:right;"><select class="filter-select" onchange="handleStatusChange(this,'${c.id}')"
+                style="padding:6px 12px;font-size:12px;border-radius:6px;border:1px solid #cbd5e1;background-color:#f8fafc;">
+                ${PENDING_ACTIONS}</select></td>
+            </tr></tbody>`;
+        }
+
+        function buildReviewRow(c) {
+            const stackStr = (c.techStack || []).join(', ');
+            const workStr  = (c.workHistory || []).map(w =>
+                `<strong>${w.title}</strong> at ${w.org} (${w.period}): ${w.body}`).join('<br><br>');
+            return `<tbody class="candidate-row-group"><tr class="enterprise-row">
+              <td><span style="font-family:monospace;color:#64748b;">#${c.id}</span></td>
+              <td><strong>${c.role}</strong></td>
+              <td>${c.subdept}</td>
+              <td><div class="timestamp-txt">${c.resumeRequestDate || '—'}</div></td>
+              <td><div class="timestamp-txt" style="color:#0f172a;font-weight:500;">${c.resumeSubmittedOn || '—'}</div></td>
+              <td>${statusBadge(c.resumeStatus)}</td>
+              <td style="text-align:center;"><button onclick="openResumeModal('${c.id}','${c.dept}','${c.exp}','${c.resumeSubmittedOn || '—'}',
+                ${JSON.stringify(stackStr)},'${(c.education||'').replace(/'/g,"&#39;")}',${JSON.stringify(workStr)})"
+                class="btn-primary-action" style="padding:6px 12px;font-weight:600;border:1px solid var(--primary-blue);background:#f0f9ff;color:var(--primary-blue);">View Resume</button></td>
+              <td style="text-align:center;"><button onclick="openNotesModal('${c.role} (${c.id})',this,'${c.id}')"
+                style="width:36px;height:36px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${c.hrNotes ? '#2563eb' : '#94a3b8'}" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </button></td>
+              <td style="text-align:right;"><select class="filter-select" onchange="handleStatusChange(this,'${c.id}')"
+                style="padding:6px 12px;font-size:12px;border-radius:6px;border:1px solid #cbd5e1;background-color:#f8fafc;">
+                ${REVIEW_ACTIONS}</select></td>
+            </tr></tbody>`;
+        }
+
+        function renderKPIs(stats) {
+            const map = {
+                'Upload Pending':    'kpi-upload-pending',
+                'Upload Overdue':    'kpi-upload-overdue',
+                'Request Sent':      'kpi-request-sent',
+                'Incomplete Resume': 'kpi-incomplete',
+                'Awaiting Review':   'kpi-awaiting-review',
+                'On Hold':           'kpi-on-hold',
+            };
+            for (const [status, id] of Object.entries(map)) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = stats[status] || 0;
+            }
+        }
+
+        async function loadQueueFromAPI() {
+            try {
+                const data = await ElastiCrewAPI.getResumeQueue();
+                renderKPIs(data.stats);
+                const pb = document.getElementById('pending-queue-body');
+                if (pb) {
+                    pb.innerHTML = data.pendingQueue.length
+                        ? data.pendingQueue.map(buildPendingRow).join('')
+                        : '<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8;">No candidates in pending queue.</td></tr>';
+                    const pc = document.getElementById('pending-queue-count');
+                    if (pc) pc.textContent = data.pendingQueue.length;
+                }
+                const rb = document.getElementById('review-queue-body');
+                if (rb) {
+                    rb.innerHTML = data.reviewQueue.length
+                        ? data.reviewQueue.map(buildReviewRow).join('')
+                        : '<tr><td colspan="9" style="text-align:center;padding:20px;color:#94a3b8;">No candidates in review queue.</td></tr>';
+                    const rc = document.getElementById('review-queue-count');
+                    if (rc) rc.textContent = data.reviewQueue.length;
+                }
+            } catch (e) {
+                console.info('API unavailable, using static content:', e.message);
+            }
+        }
+
+        loadQueueFromAPI();
+    </script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticrew - Evaluation Reports Hub</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- INTERNAL MONITORING GRID GEOMETRY --- */
+        .grid-layout-th, .grid-layout-td { padding: 14px 16px; text-align: left; vertical-align: middle; }
+        .col-name { width: 30%; }
+        .col-dept { width: 35%; }
+        .col-manage { width: 15%; text-align: right; }
+        .col-remarks { width: 20%; text-align: right; }
+
+        /* --- POPUP REMARKS MODAL STYLINGS --- */
+        .remarks-popup-card {
+            max-width: 480px;
+            width: 90%;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .remarks-textarea-modal {
+            width: 100%;
+            height: 140px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 13px;
+            color: var(--text-dark);
+            resize: none;
+            background: #f8fafc;
+            box-sizing: border-box;
+            font-family: inherit;
+            margin-bottom: 14px;
+            transition: all 0.12s ease;
+        }
+        .remarks-textarea-modal:focus {
+            background: #ffffff;
+            border-color: var(--primary-blue);
+            outline: none;
+        }
+
+        /* --- HIGH-FIDELITY INTERIOR REVIEW MODAL OVERRIDES --- */
+        .premium-viewport-modal {
+            max-width: 1360px !important;
+            width: 95% !important;
+            height: 90vh !important;
+            max-height: 90vh !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc !important;
+            border-radius: 12px;
+        }
+        
+        .modal-embedded-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-header-banner {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .avatar-img-embedded { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #e2e8f0; }
+        .embedded-info h2 { font-size: 15px; font-weight: 700; margin: 0 0 2px 0; color: #0f172a; }
+        .embedded-info p { font-size: 12px; color: #64748b; margin: 0; }
+
+        .parallel-columns-workspace {
+            display: grid;
+            grid-template-columns: 280px 1fr 1fr;
+            gap: 14px;
+            flex-grow: 1;
+            height: calc(100% - 90px);
+            min-height: 0;
+            margin-bottom: 12px;
+        }
+
+        .modal-dash-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .modal-dash-card h4 { font-size: 12px; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; flex-shrink: 0; }
+        .modal-scroll-interior { flex-grow: 1; overflow-y: auto; padding-right: 2px; }
+
+        .resizable-video-frame { width: 100%; background: #000; border-radius: 6px; height: 160px; margin-bottom: 8px; flex-shrink: 0; }
+        
+        .clips-matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px; flex-shrink: 0; }
+        .clip-matrix-node { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 2px; text-align: center; font-size: 10px; font-weight: 600; color: #475569; cursor: pointer; white-space: nowrap; }
+        .clip-matrix-node.active-clip { background: #2563eb; color: #ffffff; border-color: #1d4ed8; }
+
+        .horizontal-split-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 10px; margin-top: auto; flex-shrink: 0; height: 140px; }
+        .footer-split-section { display: flex; flex-direction: column; min-height: 0; }
+        .footer-split-section h5 { font-size: 10.5px; font-weight: 700; color: #475569; text-transform: uppercase; margin: 0 0 4px 0; flex-shrink: 0; }
+        .box-scroll-transcript { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; flex-grow: 1; overflow-y: auto; padding: 8px; font-size: 11px; line-height: 1.4; }
+        
+        .tech-tag-badge { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; font-size: 10.5px; font-weight: 500; padding: 2px 6px; border-radius: 4px; }
+        .inline-badge-list { display: flex; flex-wrap: wrap; gap: 4px; }
+        .progress-bar-track { display: flex; align-items: center; justify-content: space-between; font-size: 10px; margin-bottom: 4px; }
+        
+        .link-success-banner { background-color: #dcfce7; border: 1px solid #bbf7d0; color: #15803d; padding: 10px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; display: none; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header"><h1 class="sidebar-brand">ElastiCrew</h1></div>
+        <ul class="nav-menu">
+            <li class="nav-menu-item"><a href="/hiring-queue.html"><span>Hiring Queue</span></a></li>
+            <li class="nav-menu-item"><a href="/"><span>All Candidates</span></a></li>
+            <li class="nav-menu-item"><a href="/assessments.html"><span>Assessments</span></a></li>
+            <li class="nav-menu-item active"><a href="/reports.html"><span>Reports</span></a></li>
+            <li class="nav-menu-item"><a href="/dashboard.html"><span>Dashboard</span></a></li>
+            <li class="nav-menu-item"><a href="/departments.html"><span>Departments</span></a></li>
+            <li class="nav-menu-item"><a href="/settings.html"><span>Settings</span></a></li>
+        </ul>
+        <div class="logout-container"><a href="#" class="logout-link"><span>Logout</span></a></div>
+    </nav>
+
+    <main class="main-content">
+        <header class="header-actions">
+            <h1 class="page-title">Candidate Evaluation Reports Hub</h1>
+        </header>
+
+        <section class="candidates-section">
+            <div class="filter-bar">
+                <div class="search-box" style="max-width: 360px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="searchReport" placeholder="Search finalized profiles...">
+                </div>
+            </div>
+
+            <div class="table-responsive-wrapper">
+                <table class="candidate-table" style="table-layout: fixed; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th class="grid-layout-th col-name">Candidate Name</th>
+                            <th class="grid-layout-th col-dept">Sub Dept Track</th>
+                            <th class="grid-layout-th col-manage">Evaluation Dossier</th>
+                            <th class="grid-layout-th col-remarks" style="padding-right: 24px;">Action Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsListBody">
+                        <tr class="candidate-row" data-name="James Anderson" data-role="Software Engineer" data-remarks="Strong logical mapping, minor gaps in Docker lifecycle config. Worth escalating.">
+                            <td class="grid-layout-td col-name"><strong>James Anderson</strong></td>
+                            <td class="grid-layout-td col-dept">Engineering - Full Stack</td>
+                            <td class="grid-layout-td col-manage">
+                                <button class="btn-secondary" style="padding: 6px 12px; font-size: var(--font-size-small); color: var(--primary-blue);" onclick="triggerReportModal('James Anderson', 'Software Engineer')">Review Report</button>
+                            </td>
+                            <td class="grid-layout-td col-remarks" style="padding-right: 24px;">
+                                <button class="btn-secondary" style="padding: 6px 12px; font-size: var(--font-size-small); color: #475569; border-color: #cbd5e1;" onclick="triggerRemarksModal('James Anderson')">View/Edit Remarks</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="reportModalOverlay">
+        <div class="modal-card premium-viewport-modal">
+            <div class="modal-embedded-wrapper">
+                
+                <div class="modal-header-banner">
+                    <div class="flex-center">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="avatar-img-embedded" alt="James Anderson">
+                        <div class="embedded-info" style="margin-left: 8px;">
+                            <h2 id="modalTargetName">James Anderson</h2>
+                            <p id="modalTargetRole">Software Engineer</p>
+                        </div>
+                    </div>
+                    <div class="flex-center" style="gap: 10px;">
+                        <button class="btn-submit" style="background-color: #7c3aed; padding: 6px 12px; font-size:12px;" onclick="generateSecureClientLink()">🔗 Generate 24H Share Link</button>
+                        <button class="btn-secondary" style="padding: 6px 12px; font-size:12px;" onclick="closeReportModal()">Close Preview</button>
+                    </div>
+                </div>
+
+                <div class="link-success-banner" id="linkSuccessBanner"></div>
+
+                <div class="parallel-columns-workspace">
+                    
+                    <div class="modal-dash-card">
+                        <h4>Elasticrew Resume</h4>
+                        <div class="modal-scroll-interior">
+                            <div class="flex-between" style="background:#f8fafc; padding:6px 8px; border-radius:4px; margin-bottom:10px; border:1px solid #e2e8f0; font-size:11.5px;">
+                                <span style="font-weight:600; color:#334155;">Layout Analysis</span>
+                                <span style="font-weight:700; color:#2563eb;">88%</span>
+                            </div>
+                            <ul style="font-size:11.5px; padding-left:14px; margin:0 0 12px 0; line-height:1.4; color:#334155;">
+                                <li>Well structured documentation parameters</li>
+                                <li>Strong backend system logic capabilities</li>
+                                <li>Relevant microservices development experience</li>
+                            </ul>
+                            <div class="inline-badge-list" style="margin-top:6px; border-top:1px solid #f1f5f9; padding-top:8px;">
+                                <span class="tech-tag-badge">Python</span><span class="tech-tag-badge">Django</span>
+                                <span class="tech-tag-badge">FastAPI</span><span class="tech-tag-badge">PostgreSQL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-dash-card">
+                        <h4>Video Screening</h4>
+                        <video id="screeningMainPlayer" controls class="resizable-video-frame">
+                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                        </video>
+                        <div class="clips-matrix-grid">
+                            <div class="clip-matrix-node active-clip">Clip Q1</div>
+                            <div class="clip-matrix-node">Clip Q2</div>
+                            <div class="clip-matrix-node">Clip Q3</div>
+                            <div class="clip-matrix-node">Clip Q4</div>
+                            <div class="clip-matrix-node">Clip Q5</div>
+                            <div class="clip-matrix-node">Clip Q6</div>
+                            <div class="clip-matrix-node">Clip Q7</div>
+                            <div class="clip-matrix-node">Clip Q8</div>
+                        </div>
+                        <div class="horizontal-split-footer">
+                            <div class="footer-split-section">
+                                <h5>Transcript</h5>
+                                <div class="box-scroll-transcript">
+                                    <div><strong>AI Bot:</strong> Tell us how you structure route exceptions.</div>
+                                    <div style="margin-top:2px;"><strong>Cand:</strong> I run global try-catch routines.</div>
+                                </div>
+                            </div>
+                            <div class="footer-split-section">
+                                <h5>AI Analysis</h5>
+                                <div class="box-scroll-transcript" style="background:#fff;">
+                                    <div class="progress-bar-track"><span>Comm</span><strong>80%</strong></div>
+                                    <div class="progress-bar-track"><span>Confidence</span><strong>85%</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-dash-card">
+                        <div class="flex-between" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 10px;">
+                            <h4 style="margin:0; border:none;">Technical Interview</h4>
+                            <button style="background:#7c3aed; color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600; cursor:pointer;" onclick="alert('KL Compiler Code Snapshot: Functional implementation verified.')">📝 Code</button>
+                        </div>
+                        <video controls class="resizable-video-frame" poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=60">
+                            <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+                        </video>
+                        <div class="horizontal-split-footer" style="margin-top:auto;">
+                            <div class="footer-split-section">
+                                <h5>Complete Transcript</h5>
+                                <div class="box-scroll-transcript">
+                                    <div><strong>Lead:</strong> Explain sorting runtime Big O choices here.</div>
+                                    <div style="margin-top:2px;"><strong>Cand:</strong> Maps drop traversal spikes back to constant time bounds.</div>
+                                </div>
+                            </div>
+                            <div class="footer-split-section">
+                                <h5>Tech Evaluation</h5>
+                                <div class="box-scroll-transcript" style="background:#fff;">
+                                    <div class="progress-bar-track"><span>Engineering</span><strong>92%</strong></div>
+                                    <div class="progress-bar-track"><span>Logic</span><strong>90%</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="remarksModalOverlay" onclick="closeRemarksOnBackdrop(event)">
+        <div class="modal-card remarks-popup-card">
+            <div class="flex-between" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin:0;" id="remarksModalHeaderTitle">Administrative Remarks</h3>
+                <button style="background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; line-height:1;" onclick="closeRemarksModal()">&times;</button>
+            </div>
+            <p style="font-size:12px; color:#64748b; margin:0 0 10px 0;">Internal remarks and candidate diagnostics. Changes cache into operational states instantly:</p>
+            
+            <textarea id="modalRemarksTextarea" class="remarks-textarea-modal" placeholder="Type administrative candidate notes here..."></textarea>
+            
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="closeRemarksModal()">Cancel</button>
+                <button class="btn-submit" style="background-color: var(--primary-blue); padding:6px 12px; font-size:12px;" onclick="saveRemarksModalPayload()">Save Remarks</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Pointers
+        const reportModalOverlay = document.getElementById('reportModalOverlay');
+        const modalTargetName = document.getElementById('modalTargetName');
+        const modalTargetRole = document.getElementById('modalTargetRole');
+        const linkSuccessBanner = document.getElementById('linkSuccessBanner');
+
+        const remarksModalOverlay = document.getElementById('remarksModalOverlay');
+        const remarksModalHeaderTitle = document.getElementById('remarksModalHeaderTitle');
+        const modalRemarksTextarea = document.getElementById('modalRemarksTextarea');
+        
+        let activeTargetRowRef = null;
+
+        // Evaluation Preview Dossier Methods
+        function triggerReportModal(name, role) {
+            modalTargetName.innerText = name;
+            modalTargetRole.innerText = role;
+            linkSuccessBanner.style.display = 'none'; 
+            reportModalOverlay.classList.add('active');
+        }
+        function closeReportModal() { reportModalOverlay.classList.remove('active'); }
+
+        // Remarks Modal Interactivity Methods
+        function triggerRemarksModal(candidateName) {
+            // Locating the calling target row safely out of rendered DOM paths
+            const rows = document.getElementsByClassName('candidate-row');
+            for(let row of rows) {
+                if(row.getAttribute('data-name') === candidateName) {
+                    activeTargetRowRef = row;
+                    break;
+                }
+            }
+
+            if(activeTargetRowRef) {
+                remarksModalHeaderTitle.innerText = `Edit Remarks: ${candidateName}`;
+                modalRemarksTextarea.value = activeTargetRowRef.getAttribute('data-remarks') || "";
+                remarksModalOverlay.classList.add('active');
+            }
+        }
+
+        function closeRemarksModal() {
+            remarksModalOverlay.classList.remove('active');
+            activeTargetRowRef = null;
+        }
+
+        function closeRemarksOnBackdrop(e) {
+            if (e.target === remarksModalOverlay) { closeRemarksModal(); }
+        }
+
+        function saveRemarksModalPayload() {
+            if(activeTargetRowRef) {
+                const updatedText = modalRemarksTextarea.value.trim();
+                activeTargetRowRef.setAttribute('data-remarks', updatedText);
+                console.log(`State Persistent Layer Synchronized successfully for ${activeTargetRowRef.getAttribute('data-name')}`);
+                closeRemarksModal();
+            }
+        }
+
+        function generateSecureClientLink() {
+            const deterministicToken = Math.random().toString(36).substring(2, 15);
+            const secureAccessUrl = `${window.location.origin}/client-report.html?access_token=ec_secure_${deterministicToken}`;
+
+            linkSuccessBanner.innerHTML = `<strong>Secure 24-Hour Token Generated Natively!</strong><br>Copy link directly to your client profile portal: <br><input type="text" value="${secureAccessUrl}" readonly style="width:100%; margin-top:6px; padding:6px; font-family:monospace; border:1px solid #bbf7d0; border-radius:4px; font-size:11px;" onclick="this.select()">`;
+            linkSuccessBanner.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticrew - Technical Interview Scheduler</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- STAKEHOLDER DEMO VERTICAL LINES ENGINE --- */
+        .grid-layout-th, .grid-layout-td {
+            padding: 14px 16px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .col-cand { width: 22%; }
+        .col-panel { width: 22%; }
+        .col-combined-time-assets { width: 32%; }
+        .col-status { width: 10%; }
+        .col-book { width: 8%; text-align: center; }
+        .col-manage { width: 6%; text-align: right; }
+
+        .candidate-table td strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+
+        /* --- BUTTON STYLE DEPARTMENT SELECTOR CHIPS --- */
+        .dept-button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .dept-btn-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dept-btn-card:hover {
+            border-color: #2563eb;
+            background: #f8fafc;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .dept-btn-card.active {
+            background: #eff6ff;
+            border-color: #2563eb;
+            box-shadow: inset 0 0 0 1px #2563eb;
+        }
+        .dept-title-txt { font-size: 13px; font-weight: 700; color: #1e293b; }
+        .dept-btn-card.active .dept-title-txt { color: #1d4ed8; }
+        .dept-pill-count { font-size: 10px; background: #f1f5f9; padding: 2px 6px; border-radius: 10px; font-weight: 600; color: #475569; }
+        .dept-btn-card.active .dept-pill-count { background: #3b82f6; color: #ffffff; }
+
+        /* --- DRAWER INTERIOR LAYOUT CONTAINER --- */
+        .panel-directory-drawer {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeInDrawer 0.15s ease-out;
+        }
+        @keyframes fadeInDrawer {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .panellist-chip {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f8fafc;
+            color: #334155;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+        }
+        .remove-chip-btn { background: none; border: none; color: #94a3b8; margin-left: 8px; cursor: pointer; font-size: 14px; font-weight: 700; line-height: 1; }
+        .remove-chip-btn:hover { color: #b91c1c; }
+
+        /* --- STAGE BADGE ELEMENT HIGHLIGHTS --- */
+        .stage-tag { display: inline-block; padding: 4px 10px; font-size: 10px; font-weight: 600; border-radius: 12px; text-align: center; }
+        .stage-tag.pending { background-color: #f1f5f9; color: #475569; }
+        .stage-tag.completed { background-color: #dcfce7; color: #15803d; }
+        .stage-tag.cancelled { background-color: #fee2e2; color: #b91c1c; }
+
+        .asset-link-active { color: #7c3aed; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; }
+        .asset-link-active:hover { text-decoration: underline; }
+        .stacked-panel-wrapper { margin-bottom: 4px; }
+        .stacked-panel-wrapper:last-child { margin-bottom: 0; }
+        .timestamp-txt { font-family: monospace; font-size: 12px; color: #1e293b; font-weight: 600; }
+        .checkbox-dropdown-panel { border: 1px solid #cbd5e1; border-radius: 6px; max-height: 120px; overflow-y: auto; padding: 8px 12px; background-color: #ffffff; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; color: #334155; cursor: pointer; }
+    </style>
+
+    <style>
+        /* Strictly prevent horizontal scrolling */
+        .table-responsive-wrapper {
+            overflow-x: hidden !important;
+        }
+        .enterprise-table th {
+            word-wrap: break-word;
+            white-space: normal !important;
+            padding-right: 8px !important;
+        }
+        .enterprise-table td {
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header"><h1 class="sidebar-brand">ElastiCrew</h1></div>
+        <ul class="nav-menu">
+            <li class="nav-menu-item active"><a href="hiring-queue.html?v=3"><span>Hiring Queue</span></a></li>
+            <li class="nav-menu-item"><a href="all-candidates.html?v=3"><span>All Candidates</span></a></li>
+            <li class="nav-menu-item"><a href="assessments.html?v=3"><span>Assessments</span></a></li>
+            <li class="nav-menu-item"><a href="reports.html?v=3"><span>Reports</span></a></li>
+            <li class="nav-menu-item"><a href="dashboard.html?v=3"><span>Dashboard</span></a></li>
+            <li class="nav-menu-item"><a href="departments.html?v=3"><span>Departments</span></a></li>
+            <li class="nav-menu-item"><a href="settings.html?v=3"><span>Settings</span></a></li>
+        </ul>
+        <div class="logout-container"><a href="#" class="logout-link"><span>Logout</span></a></div>
+    </nav>
+
+    <main class="main-content" style="padding: 24px 40px !important;">
+        <div style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.8px;">Pipeline Stages</div>
+                        <style>
+            .pipeline-stepper {
+                display: flex;
+                align-items: center;
+                margin-bottom: 30px;
+                background: #ffffff;
+                padding: 16px 20px;
+                border-radius: 24px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+                border: 1px solid #f1f5f9;
+                justify-content: space-between;
+                position: relative;
+            }
+            .pipeline-step {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 24px;
+                border-radius: 30px;
+                background: #f8fafc;
+                color: #64748b;
+                font-weight: 600;
+                font-size: 14px;
+                text-decoration: none;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid transparent;
+                position: relative;
+                z-index: 2;
+            }
+            
+            .pipeline-step svg {
+                color: #94a3b8;
+                transition: all 0.4s ease;
+            }
+            
+
+
+            
+            .pipeline-step.active {
+                background: var(--primary-blue) !important;
+                color: #ffffff !important;
+                box-shadow: 0 6px 16px rgba(14, 45, 123, 0.3);
+                
+            }
+            .pipeline-step.active svg {
+                color: #ffffff !important;
+            }
+            
+            .pipeline-step:not(.active):hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            }
+            
+            .step-connector {
+                flex: 1;
+                height: 4px;
+                background: #e2e8f0;
+                margin: 0 -15px;
+                z-index: 1;
+                border-radius: 2px;
+                transition: all 0.4s ease;
+            }
+
+
+        </style>
+        <div class="pipeline-stepper">
+            <!-- Step 1 -->
+            <a href="hiring-queue.html?v=3" class="pipeline-step ">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 7l-7 5 7 5V7z"></path>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+                <span>Video Bot Screening</span>
+            </a>
+            <div class="step-connector "></div>
+            <!-- Step 2 -->
+            <a href="#" class="pipeline-step ">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                </svg>
+                <span>MCQ Assessment</span>
+            </a>
+            <div class="step-connector "></div>
+            <!-- Step 3 -->
+            <a href="tech-scheduler.html?v=3" class="pipeline-step active">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                </svg>
+                <span>Tech Scheduler</span>
+            </a>
+            <div class="step-connector "></div>
+            <!-- Step 4 -->
+            <a href="#" class="pipeline-step ">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>HR Interview</span>
+            </a>
+        </div>
+
+        
+        <header class="header-actions" style="margin-bottom: 20px;">
+            <div>
+                <h1 class="page-title">Panelist Management</h1>
+            </div>
+        </header>
+
+        <!-- Panelist Management Section -->
+        <section class="panelist-management-section" style="margin-bottom: 30px;">
+            <!-- Tabs -->
+            <div style="display: flex; gap: 10px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px;">
+                <div onclick="selectPanelTrack('Tech and Delivery', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Tech & Delivery</span>
+                    <span id="badge-Tech-and-Delivery" class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">2</span>
+                </div>
+                <div onclick="selectPanelTrack('Operations', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Operations</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">0</span>
+                </div>
+                <div onclick="selectPanelTrack('HR', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">HR</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">0</span>
+                </div>
+                <div onclick="selectPanelTrack('Finance', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Finance</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">0</span>
+                </div>
+                <div onclick="selectPanelTrack('Sales', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Sales</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">0</span>
+                </div>
+                <div onclick="selectPanelTrack('Branding & Mktg', this)" class="panel-track-tab" style="display: flex; align-items: center; justify-content: space-between; min-width: 160px; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                    <span class="tab-title" style="font-size: 13px; font-weight: 600; color: #0f172a;">Branding & Mktg</span>
+                    <span class="tab-badge" style="background: #f1f5f9; color: #64748b; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;">0</span>
+                </div>
+            </div>
+
+            <!-- Panel Roster Card (Hidden by default) -->
+            <div id="panelRosterCard" style="display: none; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+                <h3 id="panelRosterTitle" style="font-size: 15px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">Tech and Delivery Panel Roster</h3>
+                <p style="font-size: 12px; color: #64748b; margin: 0 0 16px 0;">Register panellists for this track below. Added users become visible when booking slots for candidates matching this department.</p>
+                
+                <button onclick="togglePanelModal(true)" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; margin-bottom: 24px;">Add Panelist</button>
+                
+                <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 0 -20px 20px -20px;">
+                
+                <!-- Panellist Chips -->
+                <div id="panellistChipsContainer" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <div class="dummy-panellist-chip" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px;">
+                        <span style="font-weight: 700; color: #0f172a;">Gaurav Paliwal</span>
+                        <span style="color: #64748b;">(Group Manager)</span>
+                        <span style="color: #94a3b8; cursor: pointer; font-size: 14px; margin-left: 4px;" onclick="this.parentElement.remove()">&times;</span>
+                    </div>
+                    <div class="dummy-panellist-chip" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px;">
+                        <span style="font-weight: 700; color: #0f172a;">Arpit Pathak</span>
+                        <span style="color: #64748b;">(Manager)</span>
+                        <span style="color: #94a3b8; cursor: pointer; font-size: 14px; margin-left: 4px;" onclick="this.parentElement.remove()">&times;</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            function selectPanelTrack(trackName, tabElement) {
+                const isAlreadyActive = tabElement.style.backgroundColor === 'rgb(239, 246, 255)' || tabElement.style.background === '#eff6ff';
+
+                const tabs = document.querySelectorAll('.panel-track-tab');
+                tabs.forEach(tab => {
+                    tab.style.background = 'white';
+                    tab.style.border = '1px solid #e2e8f0';
+                    tab.querySelector('.tab-title').style.color = '#0f172a';
+                    tab.querySelector('.tab-title').style.fontWeight = '600';
+                    tab.querySelector('.tab-badge').style.background = '#f1f5f9';
+                    tab.querySelector('.tab-badge').style.color = '#64748b';
+                });
+                
+                if (isAlreadyActive) {
+                    document.getElementById('panelRosterCard').style.display = 'none';
+                    return;
+                }
+
+                tabElement.style.background = '#eff6ff';
+                tabElement.style.border = '1px solid #3b82f6';
+                tabElement.querySelector('.tab-title').style.color = '#1d4ed8';
+                tabElement.querySelector('.tab-title').style.fontWeight = '700';
+                tabElement.querySelector('.tab-badge').style.background = '#3b82f6';
+                tabElement.querySelector('.tab-badge').style.color = 'white';
+                
+                document.getElementById('panelRosterTitle').innerText = trackName + " Panel Roster";
+                
+                // Integrate with original system
+                currentActiveSelectedDepartment = trackName;
+                if (typeof renderPanellistDirectoryChips === 'function') {
+                    renderPanellistDirectoryChips();
+                }
+                
+                document.getElementById('panelRosterCard').style.display = 'block';
+            }
+        
+        function openPanelistDetailsModal(id, name, date, panelistsStr) {
+            document.getElementById('pd_candidateId').innerText = id;
+            document.getElementById('pd_candidateName').innerText = name;
+            document.getElementById('pd_interviewDate').innerText = date;
+            
+            const listEl = document.getElementById('pd_panelistsList');
+            listEl.innerHTML = '';
+            const panelists = panelistsStr.split(',');
+            panelists.forEach(p => {
+                const li = document.createElement('li');
+                li.innerText = p.trim();
+                listEl.appendChild(li);
+            });
+            
+            document.getElementById('panelistDetailsModalOverlay').classList.add('active');
+        }
+
+        function closePanelistDetailsModal() {
+            document.getElementById('panelistDetailsModalOverlay').classList.remove('active');
+        }
+</script>
+        
+
+<header class="header-actions" style="margin-bottom: 20px;">
+            <div>
+                <h1 class="page-title">Technical Interview Workspace</h1>
+                <p style="color: #64748b; font-size: 14px; margin-top: 6px;">Manage human panellists, schedule technical rounds, and review direct feedback.</p>
+            </div>
+        </header>
+
+        <!-- Action-Oriented KPI Panel -->
+        <section class="kpi-panel-container">
+            <div class="kpi-card warning">
+                <div class="kpi-label">Pending Interview Scheduling</div>
+                <div class="kpi-count">8</div>
+            </div>
+            <div class="kpi-card neutral">
+                <div class="kpi-label">Interview Scheduled</div>
+                <div class="kpi-count">14</div>
+            </div>
+            <div class="kpi-card danger">
+                <div class="kpi-label">Pending HR Review</div>
+                <div class="kpi-count">3</div>
+            </div>
+            <div class="kpi-card danger">
+                <div class="kpi-label">Candidate cannot Join Interview</div>
+                <div class="kpi-count">2</div>
+            </div>
+            <div class="kpi-card success">
+                <div class="kpi-label">Ready For HR Round</div>
+                <div class="kpi-count">6</div>
+            </div>
+        </section>
+
+        <!-- Sub Nav Tab Segment Control Layer -->
+        
+
+
+
+                <!-- Enterprise Data Grid (Tech Scheduler) -->
+        <section class="candidates-section">
+
+            <div style="margin-top: 30px; margin-bottom: 12px; padding-left: 24px;">
+                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">
+                    Tech. Interview Pending Queue <span style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">5</span>
+                </h2>
+                <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates Pending Technical Interview Scheduling</p>
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="candidate-table enterprise-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%; ">Candidate_ID</th>
+                            <th style="width: 20%; ">Candidate Name</th>
+                            <th style="width: 15%; ">Sub Dept.</th>
+                            <th style="width: 15%; ">Interview Date & Time</th>
+                            <th style="width: 12%; ">Interview Status</th>
+                            <th style="width: 10%; text-align: center; ">HR Notes</th>
+                            <th style="width: 18%; text-align: center; ">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1042</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Alan Turing</strong></div>
+                                </div>
+                            </td>
+                            <td>Backend Eng</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">-</div>
+                            </td>
+                            <td><span class="status-badge" style="background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending Scheduling</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Alan Turing', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; justify-content: center;">
+                                    <button onclick="openRowBookingModal('Alan Turing', 'Operations')" class="btn-primary-action" style="padding: 6px 12px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue);">Schedule Interview</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1048</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Margaret Hamilton</strong></div>
+                                </div>
+                            </td>
+                            <td>Systems Eng</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#64748b;">-</div>
+                            </td>
+                            <td><span class="status-badge" style="background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending Scheduling</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Margaret Hamilton', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; justify-content: center;">
+                                    <button onclick="openRowBookingModal('Margaret Hamilton', 'Tech and Delivery')" class="btn-primary-action" style="padding: 6px 12px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue);">Schedule Interview</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1051</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>John von Neumann</strong></div>
+                                </div>
+                            </td>
+                            <td>Data Science</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">04 Jun 2026, 02:00 PM</div>
+                            </td>
+                            <td><span class="status-badge" style="background: #ffedd5; color: #c2410c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Postpone the interview</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('John von Neumann', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; justify-content: center;">
+                                    <button onclick="openRowBookingModal('John von Neumann', 'HR')" class="btn-primary-action" style="padding: 6px 12px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue);">Schedule Interview</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1055</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Tim Berners-Lee</strong></div>
+                                </div>
+                            </td>
+                            <td>Network Eng</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">05 Jun 2026, 11:00 AM</div>
+                            </td>
+                            <td><span class="status-badge" style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Candidate cannot Join Interview</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Tim Berners-Lee', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; justify-content: center;">
+                                    <button onclick="openRowBookingModal('Tim Berners-Lee', 'Finance')" class="btn-primary-action" style="padding: 6px 12px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue);">Schedule Interview</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1058</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Linus Torvalds</strong></div>
+                                </div>
+                            </td>
+                            <td>Linux Admin</td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">06 Jun 2026, 02:30 PM</div>
+                            </td>
+                            <td><span class="status-badge" style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Candidate cannot Join Interview</span></td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Linus Torvalds', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; justify-content: center;">
+                                    <button onclick="openRowBookingModal('Linus Torvalds', 'Tech and Delivery')" class="btn-primary-action" style="padding: 6px 12px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue);">Schedule Interview</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 40px; margin-bottom: 12px; padding-left: 24px;">
+                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center;">
+                    Tech. Interview Completed Queue <span style="background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 10px;">3</span>
+                </h2>
+                <p style="font-size: 13px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Candidates who have Completed Technical Interviews</p>
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="candidate-table enterprise-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 7%; ">CANDIDATE_ID</th>
+                            <th style="width: 10%; ">NAME</th>
+                            <th style="width: 11%; ">SUB DEPT.</th>
+                            <th style="width: 11%; ">Panelist Name</th>
+                            <th style="width: 10%; ">Interview Date & Time</th>
+                            <th style="width: 10%; ">HR Review Status</th>
+                            <th style="width: 19%; text-align: center; ">Interview Assets</th>
+                            <th style="width: 8%; text-align: center; ">HR NOTES</th>
+                            <th style="width: 14%; text-align: center;">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1021</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Grace Hopper</strong></div>
+                                </div>
+                            </td>
+                            <td>Full Stack Eng</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <strong>Gaurav Paliwal</strong>
+                                    <span class="badge" onclick="openPanelistDetailsModal('#C-1021', 'Grace Hopper', '03 Jun 2026, 10:00 AM', 'Gaurav Paliwal, Anita Borg')" style="background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer;">+1 More</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">03 Jun 2026, 10:00 AM</div>
+                            </td>
+                            <td><span class="status-badge" style="background: #eff6ff; color: #1d4ed8; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">HR Review Completed</span></td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; gap: 4px; justify-content: center;">
+                                    <button class="btn-primary-action" style="padding: 4px 6px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue); font-size: 10px; border-radius: 4px;">Recording</button>
+                                    <button class="btn-primary-action" style="padding: 4px 6px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue); font-size: 10px; border-radius: 4px;">Transcript</button>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Grace Hopper', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; justify-content: center;">
+                                    <select class="filter-select" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc; font-weight: 600; color: #475569;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="hr">Ready For HR Interview</option>
+                                        <option value="hold">On Hold</option>
+                                        <option value="reject">Reject</option>
+                                        <option value="complete">Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1045</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Ada Lovelace</strong></div>
+                                </div>
+                            </td>
+                            <td>Frontend Eng</td>
+                            <td>
+                                <strong>Ankit Mehta</strong>
+                            </td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">02 Jun 2026, 2:00 PM</div>
+                            </td>
+                            <td><span class="status-badge" style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">Pending HR Review</span></td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; gap: 4px; justify-content: center;">
+                                    <button class="btn-primary-action" style="padding: 4px 6px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue); font-size: 10px; border-radius: 4px;">Recording</button>
+                                    <button class="btn-primary-action" style="padding: 4px 6px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue); font-size: 10px; border-radius: 4px;">Transcript</button>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Ada Lovelace', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; justify-content: center;">
+                                    <select class="filter-select" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc; font-weight: 600; color: #475569;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="hr">Ready For HR Interview</option>
+                                        <option value="hold">On Hold</option>
+                                        <option value="reject">Reject</option>
+                                        <option value="complete">Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody class="candidate-row-group">
+                        <tr class="enterprise-row">
+                            <td><span style="font-family: monospace; color: #64748b;">#C-1025</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div><strong>Charles Babbage</strong></div>
+                                </div>
+                            </td>
+                            <td>Hardware Eng</td>
+                            <td>
+                                <strong>Linus Torvalds</strong>
+                            </td>
+                            <td>
+                                <div class="timestamp-txt" style="color:#0f172a; font-weight:500;">01 Jun 2026, 11:30 AM</div>
+                            </td>
+                            <td><span class="status-badge" style="background: #eff6ff; color: #1d4ed8; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">HR Review Completed</span></td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; gap: 4px; justify-content: center;">
+                                    <button class="btn-primary-action" style="padding: 4px 6px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue); font-size: 10px; border-radius: 4px;">Recording</button>
+                                    <button class="btn-primary-action" style="padding: 4px 6px; font-weight: 600; border: 1px solid var(--primary-blue); background: #f0f9ff; color: var(--primary-blue); font-size: 10px; border-radius: 4px;">Transcript</button>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <button onclick="openNotesModal('Charles Babbage', this)" style="position: relative; width: 36px; height: 36px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </button>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; justify-content: center;">
+                                    <select class="filter-select" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc; font-weight: 600; color: #475569;">
+                                        <option value="" disabled selected>Workflow Actions</option>
+                                        <option value="hr">Ready For HR Interview</option>
+                                        <option value="hold">On Hold</option>
+                                        <option value="reject">Reject</option>
+                                        <option value="complete">Review Completed</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    
+    <div class="modal-overlay" id="panelistDetailsModalOverlay">
+        <div class="modal-card" style="max-width: 440px;">
+            <h2 class="modal-header">Interview Details</h2>
+            <div style="margin-top: 16px;">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div><span style="color:#64748b; font-size:12px;">Candidate ID:</span> <span id="pd_candidateId" style="font-weight:600; margin-left:8px; font-family: monospace;"></span></div>
+                    <div><span style="color:#64748b; font-size:12px;">Candidate Name:</span> <span id="pd_candidateName" style="font-weight:600; margin-left:8px;"></span></div>
+                    <div><span style="color:#64748b; font-size:12px;">Interview Date & Time:</span> <span id="pd_interviewDate" style="font-weight:600; margin-left:8px;"></span></div>
+                    <div>
+                        <span style="color:#64748b; font-size:12px;">Panelists:</span>
+                        <ul id="pd_panelistsList" style="margin-top: 8px; padding-left: 20px; font-weight: 600; color: #0f172a; font-size: 13px; line-height: 1.8;"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions" style="margin-top: 24px; display: flex; justify-content: flex-end;">
+                <button type="button" class="btn-secondary" onclick="closePanelistDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="panelModalOverlay">
+        <div class="modal-card" style="max-width: 440px;">
+            <h2 class="modal-header">Register Technical Panellist</h2>
+            <form id="panellistForm">
+                <div class="form-group">
+                    <label for="panelName">Full Name</label>
+                    <input type="text" id="panelName" class="form-control" placeholder="Enter Panellist's name" required>
+                </div>
+                <div class="form-group">
+                    <label for="panelDesignation">Designation</label>
+                    <input type="text" id="panelDesignation" class="form-control" placeholder="e.g., Team Leader, Executive" required>
+                </div>
+                <div class="form-group">
+                    <label for="panelEmail">Email ID</label>
+                    <input type="email" id="panelEmail" class="form-control" placeholder="username@company.com" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="togglePanelModal(false)">Cancel</button>
+                    <button type="submit" class="btn-submit" style="background-color: var(--primary-blue);">Add Panellist</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="scheduleModalOverlay">
+        <div class="modal-card" style="max-width: 460px;">
+            <h2 class="modal-header" style="font-size:16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">Schedule Panel Session</h2>
+            <form id="techSchedulerForm" style="margin-top:12px;">
+                <div class="form-group">
+                    <label>Selected Candidate</label>
+                    <input type="text" id="displayCandidateName" class="form-control" readonly style="background:#f1f5f9; font-weight:700;">
+                </div>
+                <div class="form-group">
+                    <label id="panellistSectionLabel">Available Panellists</label>
+                    <div id="panellistChipsContainer" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
+                    <div style="position: relative;">
+                        <input type="text" id="panellistSearchInput" class="form-control" placeholder="Search Name by Panelist" onkeyup="filterPanellists()" onfocus="showDropdown()" autocomplete="off" style="margin-bottom: 8px; font-size: 13px;">
+                        <div class="checkbox-dropdown-panel" id="panellistDropdownList" style="display: none; border: 1px solid #cbd5e1; border-radius: 6px; max-height: 120px; overflow-y: auto; background-color: #ffffff; position: absolute; z-index: 1000; width: 100%; top: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="selectDuration">Session Duration Frame</label>
+                    <select id="selectDuration" class="form-control" required>
+                        <option value="30 mins">30 mins</option>
+                        <option value="45 mins">45 mins</option>
+                        <option value="60 mins" selected>60 mins</option>
+                        <option value="1:30 mins">1:30 mins</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label for="interviewDate">Target Date</label>
+                        <input type="date" id="interviewDate" class="form-control" required>
+                    </div>
+                    <div>
+                        <label for="interviewTime">Start Time Slot</label>
+                        <input type="time" id="interviewTime" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button type="button" class="btn-secondary" onclick="toggleScheduleModal(false)">Cancel</button>
+                    <button type="submit" class="btn-submit" style="background-color: #10b981;">Confirm Booking Slot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // DEMO READY STATE: Starts with empty arrays except for the initial pre-seeded group
+        let globalDepartmentPanellistMatrix = {
+            "Tech and Delivery": [
+                { name: "Gaurav Paliwal", desig: "Group Manager", email: "gaurav.p@elasticrew.com" },
+                { name: "Arpit Pathak", desig: "Manager", email: "arpit.p@elasticrew.com" }
+            ],
+            "Operations": [],
+            "HR": [],
+            "Finance": [],
+            "Sales": [],
+            "Branding and Marketing": []
+        };
+
+        let currentActiveSelectedDepartment = "Tech and Delivery";
+        let targetRowCandidateName = "";
+        let targetRowCandidateDept = "";
+
+        const schedulerListBody = document.getElementById('schedulerListBody');
+        const totalCountBubble = document.getElementById('totalCountBubble');
+        const panelDirectoryDrawer = document.getElementById('panelDirectoryDrawer');
+        const drawerActiveTitle = document.getElementById('drawerActiveTitle');
+        const panellistChipBox = document.getElementById('panellistChipBox');
+        
+        const panelModalOverlay = document.getElementById('panelModalOverlay');
+        const scheduleModalOverlay = document.getElementById('scheduleModalOverlay');
+        const panellistForm = document.getElementById('panellistForm');
+        const techSchedulerForm = document.getElementById('techSchedulerForm');
+        const panellistCheckboxContainer = document.getElementById('panellistCheckboxContainer');
+        const displayCandidateName = document.getElementById('displayCandidateName');
+        const panellistSectionLabel = document.getElementById('panellistSectionLabel');
+
+        function updateViewMetricCounter() {
+            totalCountBubble.innerText = schedulerListBody.getElementsByClassName('candidate-row').length;
+        }
+
+        function toggleDepartmentDrawer(cardElement) {
+            const chosenDept = cardElement.getAttribute('data-dept');
+            document.querySelectorAll('.dept-btn-card').forEach(c => c.classList.remove('active'));
+            
+            if (panelDirectoryDrawer.style.display === "block" && currentActiveSelectedDepartment === chosenDept) {
+                panelDirectoryDrawer.style.display = "none";
+            } else {
+                cardElement.classList.add('active');
+                currentActiveSelectedDepartment = chosenDept;
+                drawerActiveTitle.innerText = `${chosenDept} Panel Roster`;
+                renderPanellistDirectoryChips();
+                panelDirectoryDrawer.style.display = "block";
+            }
+        }
+
+        function renderPanellistDirectoryChips() {
+            const container = document.getElementById('panellistChipsContainer') || document.getElementById('panellistChipBox');
+            if (!container) return;
+            container.innerHTML = '';
+            const list = globalDepartmentPanellistMatrix[currentActiveSelectedDepartment] || [];
+            
+            if (list.length === 0) {
+                container.innerHTML = '<div style="font-size:12.5px; color:#64748b; font-style:italic; padding:4px 0;">No active panellists registered for this track. Click Add Panellist to populate.</div>';
+                return;
+            }
+
+            list.forEach((panellist, index) => {
+                const chip = document.createElement('div');
+                chip.style.cssText = "display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px;";
+                chip.innerHTML = `<span style="font-weight: 700; color: #0f172a;">${panellist.name}</span><span style="color: #64748b;">(${panellist.desig})</span><span style="color: #94a3b8; cursor: pointer; font-size: 14px; margin-left: 4px;" onclick="removeDirectoryRosterNode(${index})">&times;</span>`;
+                container.appendChild(chip);
+            });
+        }
+
+        function updateBadgeCounters() {
+            const tabs = document.querySelectorAll('.panel-track-tab');
+            tabs.forEach(tab => {
+                let title = tab.querySelector('.tab-title').innerText.trim();
+                if (title === "Tech & Delivery") title = "Tech and Delivery";
+                if (title === "Branding & Mktg") title = "Branding and Marketing";
+                
+                const count = (globalDepartmentPanellistMatrix[title] || []).length;
+                const badge = tab.querySelector('.tab-badge');
+                if (badge) badge.innerText = count;
+            });
+        }
+
+        function openAddPanellistModal() { panelModalOverlay.classList.add('active'); }
+        function togglePanelModal(show) {
+            if (show) {
+                document.getElementById('panelModalOverlay').classList.add('active');
+            } else {
+                document.getElementById('panelModalOverlay').classList.remove('active');
+                document.getElementById('panellistForm').reset();
+            }
+        }
+        
+        panellistForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('panelName').value.trim();
+            const desig = document.getElementById('panelDesignation').value.trim();
+            const email = document.getElementById('panelEmail').value.trim();
+
+            globalDepartmentPanellistMatrix[currentActiveSelectedDepartment].push({ name, desig, email });
+            togglePanelModal(false);
+            renderPanellistDirectoryChips();
+            updateBadgeCounters();
+        });
+
+        function removeDirectoryRosterNode(index) {
+            const targetName = globalDepartmentPanellistMatrix[currentActiveSelectedDepartment][index].name;
+            if (confirm(`Remove ${targetName} from the current department directory?`)) {
+                globalDepartmentPanellistMatrix[currentActiveSelectedDepartment].splice(index, 1);
+                renderPanellistDirectoryChips();
+                updateBadgeCounters();
+            }
+        }
+
+        // --- HOOK: CONTEXT LOCKED BOOKING TRIGGER BASED ON DEPT MATCHES ---
+        let currentSelectedPanellists = []; // Array of {name, desig}
+
+        function renderPanellistChips() {
+            const container = document.getElementById('panellistChipsContainer');
+            container.innerHTML = '';
+            currentSelectedPanellists.forEach((p, index) => {
+                const chip = document.createElement('div');
+                chip.style.cssText = "background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px;";
+                chip.innerHTML = `<span>${p.name} (${p.desig})</span><span style="cursor:pointer; font-weight:bold; font-size: 14px;" onclick="removePanellist(${index})">×</span>`;
+                container.appendChild(chip);
+            });
+        }
+
+        function removePanellist(index) {
+            currentSelectedPanellists.splice(index, 1);
+            renderPanellistChips();
+        }
+
+        function selectPanellist(name, desig) {
+            if (!currentSelectedPanellists.some(p => p.name === name)) {
+                currentSelectedPanellists.push({name, desig});
+                renderPanellistChips();
+            }
+            document.getElementById('panellistSearchInput').value = '';
+            document.getElementById('panellistDropdownList').style.display = 'none';
+        }
+
+        function showDropdown() {
+            document.getElementById('panellistDropdownList').style.display = 'block';
+            filterPanellists();
+        }
+        
+        document.addEventListener('click', function(e) {
+            if (e.target.id !== 'panellistSearchInput' && !e.target.closest('#panellistDropdownList')) {
+                const dd = document.getElementById('panellistDropdownList');
+                if(dd) dd.style.display = 'none';
+            }
+        });
+
+        function openRowBookingModal(candidateName, candidateDept) {
+            targetRowCandidateName = candidateName;
+            targetRowCandidateDept = candidateDept;
+            currentSelectedPanellists = [];
+            renderPanellistChips();
+            
+            displayCandidateName.value = candidateName;
+            panellistSectionLabel.innerText = `Select Panellists from ${candidateDept}:`;
+            document.getElementById('panellistSearchInput').value = '';
+            document.getElementById('panellistDropdownList').style.display = 'none';
+            document.getElementById('panellistDropdownList').innerHTML = '';
+            scheduleModalOverlay.classList.add('active');
+        }
+
+        function filterPanellists() {
+            const query = document.getElementById('panellistSearchInput').value.toLowerCase();
+            const list = globalDepartmentPanellistMatrix[targetRowCandidateDept] || [];
+            
+            const dd = document.getElementById('panellistDropdownList');
+            dd.innerHTML = '';
+            
+            // If they just manually type a name that doesn't exist, allow them to add it by pressing Enter?
+            // The prompt says "so I can manually type a name." and "using Search bar only i can select"
+            // Let's add a "Add manual panellist" option if query is not empty
+            
+            let matched = 0;
+            list.forEach(p => {
+                if (p.name.toLowerCase().includes(query)) {
+                    matched++;
+                    const item = document.createElement('div');
+                    item.style.cssText = "padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f1f5f9;";
+                    item.innerHTML = `<strong>${p.name}</strong> <span style="color:#64748b;">(${p.desig})</span>`;
+                    item.onmouseover = () => item.style.backgroundColor = '#f8fafc';
+                    item.onmouseout = () => item.style.backgroundColor = 'transparent';
+                    item.onclick = () => selectPanellist(p.name, p.desig);
+                    dd.appendChild(item);
+                }
+            });
+            
+            if (query.length > 0 && matched === 0) {
+                const item = document.createElement('div');
+                item.style.cssText = "padding: 8px 12px; cursor: pointer; font-size: 13px; color: #10b981;";
+                item.innerHTML = `+ Add "${document.getElementById('panellistSearchInput').value}"`;
+                item.onclick = () => selectPanellist(document.getElementById('panellistSearchInput').value, 'External Panellist');
+                dd.appendChild(item);
+            }
+            
+            if (matched === 0 && query.length === 0) {
+                dd.innerHTML = '<div style="padding: 8px 12px; font-size: 12px; color: #94a3b8; font-style: italic;">Type to add a panellist manually...</div>';
+            }
+            
+            dd.style.display = 'block';
+        }
+
+        function toggleScheduleModal(show) { if(!show) scheduleModalOverlay.classList.remove('active'); }
+
+        techSchedulerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if(currentSelectedPanellists.length === 0) { alert("Please attach at least one team member."); return; }
+
+            const duration = document.getElementById('selectDuration').value;
+            const rawDate = document.getElementById('interviewDate').value;
+            const rawTime = document.getElementById('interviewTime').value;
+
+            const dateObj = new Date(rawDate);
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
+            const year = String(dateObj.getFullYear()).substring(2);
+            const formattedDate = `${day} ${month} ${year}`;
+
+            const [hours, minutes] = rawTime.split(':');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedTime = `${hours % 12 || 12}:${minutes} ${ampm}`;
+
+            let panelHTML = '';
+            currentSelectedPanellists.forEach(p => {
+                panelHTML += `<div class="stacked-panel-wrapper"><strong>${p.name}</strong> <span style="font-size:11px; color:#64748b;">(${p.desig})</span></div>`;
+            });
+
+            const compactIdKey = targetRowCandidateName.replace(/\s+/g, '');
+            
+            const panelCell = document.getElementById(`panelCell-${compactIdKey}`);
+            const combinedCell = document.getElementById(`combinedCell-${compactIdKey}`);
+            const statusCell = document.getElementById(`statusCell-${compactIdKey}`);
+
+            if (panelCell && combinedCell) {
+                panelCell.innerHTML = panelHTML;
+                combinedCell.innerHTML = `<div class="timestamp-txt">${formattedDate} - ${formattedTime}</div><div style="font-size:11px; color:#64748b;">Duration: ${duration}</div>`;
+                if(statusCell) statusCell.innerHTML = '<span class="stage-tag pending">Pending</span>';
+            }
+
+            scheduleModalOverlay.classList.remove('active');
+            techSchedulerForm.reset();
+        });
+
+        function handleSchedulerAction(dropdown) {
+            const action = dropdown.value;
+            const row = dropdown.closest('.candidate-row');
+            if (!row) return;
+            const name = row.getAttribute('data-name');
+            const compactIdKey = name.replace(/\s+/g, '');
+
+            if (action === 'delete') {
+                if (confirm(`Delete ${name} from the scheduling queue?`)) {
+                    row.remove();
+                    updateViewMetricCounter();
+                }
+            } else if (action === 'cancel') {
+                const statusCell = document.getElementById(`statusCell-${compactIdKey}`);
+                const combinedCell = document.getElementById(`combinedCell-${compactIdKey}`);
+                if(statusCell) statusCell.innerHTML = '<span class="stage-tag cancelled">Cancelled</span>';
+                if(combinedCell) {
+                    combinedCell.innerHTML = '—';
+                    combinedCell.style.color = '#cbd5e1';
+                }
+                dropdown.value = "";
+            } else if (action === 'complete-manual') {
+                const statusCell = document.getElementById(`statusCell-${compactIdKey}`);
+                const combinedCell = document.getElementById(`combinedCell-${compactIdKey}`);
+                if(statusCell) statusCell.innerHTML = '<span class="stage-tag completed">Completed</span>';
+                if(combinedCell) {
+                    combinedCell.innerHTML = `
+                        <div class="timestamp-txt" style="margin-bottom: 4px;">Manually Logged</div>
+                        <div style="display:flex; gap:12px; margin-top:2px;">
+                            <span class="asset-link-active" onclick="fetchTeamsAsset('Recording', '${name}')">🎥 Recording</span>
+                            <span class="asset-link-active" onclick="fetchTeamsAsset('Transcript', '${name}')">📄 Transcript</span>
+                        </div>
+                    `;
+                }
+                dropdown.value = "";
+            } else if (action === 'hr-invite') {
+                alert(`HR round invite link successfully sent to ${name}.`);
+                dropdown.value = "";
+            }
+        }
+
+        function fetchTeamsAsset(type, name) {
+            alert(`Fetching Microsoft Teams Connected Data...\nProfile Target: ${name}\nAsset Request: Live ${type} Stream Room Passed.`);
+        }
+
+        updateBadgeCounters();
+        updateViewMetricCounter();
+    
+        function openPanelistDetailsModal(id, name, date, panelistsStr) {
+            document.getElementById('pd_candidateId').innerText = id;
+            document.getElementById('pd_candidateName').innerText = name;
+            document.getElementById('pd_interviewDate').innerText = date;
+            
+            const listEl = document.getElementById('pd_panelistsList');
+            listEl.innerHTML = '';
+            const panelists = panelistsStr.split(',');
+            panelists.forEach(p => {
+                const li = document.createElement('li');
+                li.innerText = p.trim();
+                listEl.appendChild(li);
+            });
+            
+            document.getElementById('panelistDetailsModalOverlay').classList.add('active');
+        }
+
+        function closePanelistDetailsModal() {
+            document.getElementById('panelistDetailsModalOverlay').classList.remove('active');
+        }
+</script>
+</body>
+</html>
