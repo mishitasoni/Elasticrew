@@ -5,10 +5,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 load_dotenv()
 
-DATABASE_URL: str = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://postgres:password@localhost:5432/elasticrew",
-)
+DATABASE_URL: str = os.getenv("DATABASE_URL")
 
 engine = create_async_engine(DATABASE_URL, echo=False, pool_pre_ping=True)
 

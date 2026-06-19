@@ -1,29 +1,47 @@
 from pydantic import BaseModel
 from typing import Optional
 
-
 class CandidateCreate(BaseModel):
-    name: str
+    full_name: str
     email: str
     phone: str
+
+    experience: str
+
     department: str
     sub_department: str
+
+    job_role: str
+
+    skills: Optional[str] = None
+
+    resume_file_name: Optional[str] = None
 
 
 class CandidateResponse(BaseModel):
     id: int
-    name: str
+
+    full_name: str
     email: str
     phone: str
+
+    experience: str | None = None
 
     department: str
     sub_department: str
 
-    pipeline_stage: str
+    job_role: str | None = None
+    skills: str | None = None
+
+    resume_file_name: str | None = None
+
+    stage: str
     status: str
 
-    resume_filename: Optional[str] = None
-    remarks: Optional[str] = None
+    remarks: str | None = None
+
+    date_added: str
+    created_at: str
 
     class Config:
         from_attributes = True

@@ -1,5 +1,6 @@
 from utils.resume_parser import extract_text_from_pdf
 from utils.anonymiser import anonymize_resume
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -37,11 +38,20 @@ def create_candidate(
     db: Session = Depends(get_db)
 ):
     new_candidate = Candidate(
-        name=candidate.name,
+        name=candidate.full_name,
         email=candidate.email,
         phone=candidate.phone,
+
+        experience=candidate.experience,
+
         department=candidate.department,
         sub_department=candidate.sub_department,
+
+        job_role=candidate.job_role,
+        skills=candidate.skills,
+
+        resume_filename=candidate.resume_file_name,
+
         pipeline_stage="Resume Uploaded",
         status="Active"
     )
@@ -50,15 +60,54 @@ def create_candidate(
     db.commit()
     db.refresh(new_candidate)
 
-    return new_candidate
+    return {
+    "id": new_candidate.id,
+    "full_name": new_candidate.name,
+    "email": new_candidate.email,
+    "phone": new_candidate.phone,
+    "experience": new_candidate.experience,
+    "department": new_candidate.department,
+    "sub_department": new_candidate.sub_department,
+    "job_role": new_candidate.job_role,
+    "skills": new_candidate.skills,
+    "resume_file_name": new_candidate.resume_filename,
+    "stage": new_candidate.pipeline_stage,
+    "status": new_candidate.status,
+    "remarks": new_candidate.remarks,
+    "date_added": new_candidate.created_at.strftime("%Y-%m-%d"),
+    "created_at": str(new_candidate.created_at)
+}
 
 
-@router.get("/", response_model=list[CandidateResponse])
-def get_candidates(
-    db: Session = Depends(get_db)
-):
-    return db.query(Candidate).all()
+@router.get("/")
+def get_candidates(db: Session = Depends(get_db)):
+    candidates = db.query(Candidate).all()
 
+    result = []
+
+    for c in candidates:
+        result.append({
+            "id": c.id,
+            "full_name": c.name,
+            "email": c.email,
+            "phone": c.phone,
+            "experience": c.experience,
+            "department": c.department,
+            "sub_department": c.sub_department,
+            "job_role": c.job_role,
+            "skills": c.skills,
+            "resume_file_name": c.resume_filename,
+            "stage": c.pipeline_stage,
+            "status": c.status,
+            "remarks": c.remarks,
+            "date_added": c.created_at.strftime("%Y-%m-%d"),
+            "created_at": str(c.created_at)
+        })
+
+    return {
+        "candidates": result,
+        "total": len(result)
+    }
 
 @router.post("/create-with-resume")
 async def create_candidate_with_resume(
@@ -107,30 +156,28 @@ async def create_candidate_with_resume(
             resume.file,
             buffer
         )
-    # Extract text from uploaded PDF
-    parsed_text = extract_text_from_pdf(
-    filepath
-)
 
-    anonymous_text = anonymize_resume(
-        parsed_text
-    )
+    parsed_text = extract_text_from_pdf(filepath)
+
+    anonymous_text = anonymize_resume(parsed_text)
 
     candidate = Candidate(
-    name=name,
-    email=email,
-    phone=phone,
-    department=department,
-    sub_department=sub_department,
+        name=name,
+        email=email,
+        phone=phone,
 
-    resume_filename=resume.filename,
-    resume_filepath=filepath,
+        department=department,
+        sub_department=sub_department,
 
-    pipeline_stage="Resume Uploaded",
-    status="Active",
-    parsed_resume=parsed_text,
-    anonymous_resume=anonymous_text,
-)
+        resume_filename=resume.filename,
+        resume_filepath=filepath,
+
+        pipeline_stage="Resume Uploaded",
+        status="Active",
+
+        parsed_resume=parsed_text,
+        anonymous_resume=anonymous_text
+    )
 
     db.add(candidate)
     db.commit()

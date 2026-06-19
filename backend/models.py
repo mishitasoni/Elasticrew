@@ -29,6 +29,11 @@ class Candidate(Base):
     parsed_resume = Column(String, nullable=True)
 
     anonymous_resume = Column(String, nullable=True)
+    experience = Column(String, nullable=True)
+
+    job_role = Column(String, nullable=True)
+
+    skills = Column(String, nullable=True)
 
     
 

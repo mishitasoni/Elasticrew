@@ -12,7 +12,7 @@ load_dotenv()
 config = context.config
 
 # Override sqlalchemy.url from environment if present
-db_url = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:password@localhost:5432/elasticrew")
+db_url = os.getenv("DATABASE_URL")
 config.set_main_option("sqlalchemy.url", db_url)
 
 # Interpret the config file for Python logging
