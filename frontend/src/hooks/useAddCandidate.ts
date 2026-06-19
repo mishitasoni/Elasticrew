@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { createCandidate } from '../api/candidatesApi';
+import {
+  createCandidate,
+  createCandidateWithResume,
+} from '../api/candidatesApi';
 import type { Candidate, CandidateCreate, FormErrors } from '../types/candidate';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -15,6 +18,7 @@ const EMPTY_FORM: CandidateCreate = {
   job_role: '',
   skills: '',
   resume_file_name: '',
+  resume: null,
 };
 
 function validate(data: CandidateCreate): FormErrors {
@@ -57,31 +61,62 @@ export function useAddCandidate(onSuccess: (c: Candidate) => void) {
   };
 
   const submit = async (): Promise<boolean> => {
-    const errs = validate(form);
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs);
-      return false;
-    }
+  const errs = validate(form);
 
-    setSubmitting(true);
-    setErrors({});
-    try {
-      const candidate = await createCandidate(form);
-      onSuccess(candidate);
+  if (Object.keys(errs).length > 0) {
+    setErrors(errs);
+    return false;
+  }
+
+  setSubmitting(true);
+  setErrors({});
+
+  try {
+    if (form.resume) {
+      await createCandidateWithResume(form);
+
+      // refresh list after upload
+      window.location.reload();
+
       reset();
       return true;
-    } catch (err: unknown) {
-      const e = err as { message: string; field?: string; status?: number };
-      if (e.field) {
-        setErrors({ [e.field]: e.message });
-      } else {
-        setErrors({ form: e.message || 'An unexpected error occurred.' });
-      }
-      return false;
-    } finally {
-      setSubmitting(false);
     }
-  };
 
-  return { form, errors, submitting, setField, submit, reset };
+    const candidate = await createCandidate(form);
+
+    onSuccess(candidate);
+
+    reset();
+
+    return true;
+  } catch (err: unknown) {
+    const e = err as {
+      message: string;
+      field?: string;
+      status?: number;
+    };
+
+    if (e.field) {
+      setErrors({ [e.field]: e.message });
+    } else {
+      setErrors({
+        form: e.message || 'An unexpected error occurred.',
+      });
+    }
+
+    return false;
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+  return {
+  form,
+  errors,
+  submitting,
+  setField,
+  setForm,
+  submit,
+  reset,
+};
 }

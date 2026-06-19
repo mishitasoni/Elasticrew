@@ -40,3 +40,34 @@ export async function createCandidate(payload: CandidateCreate): Promise<Candida
 
   return data as unknown as Candidate;
 }
+export async function createCandidateWithResume(
+  payload: CandidateCreate
+): Promise<unknown> {
+
+  const formData = new FormData();
+
+  formData.append('name', payload.full_name);
+  formData.append('email', payload.email);
+  formData.append('phone', payload.phone);
+  formData.append('department', payload.department);
+  formData.append('sub_department', payload.sub_department);
+
+  if (payload.resume) {
+    formData.append('resume', payload.resume);
+  }
+
+  const res = await fetch(
+    `${BASE}/candidates/create-with-resume`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || 'Resume upload failed');
+  }
+
+  return await res.json();
+}

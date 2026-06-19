@@ -47,7 +47,15 @@ export function AddCandidateModal({ isOpen, onClose, onSuccess }: AddCandidateMo
     }, 900);
   };
 
-  const { form, errors, submitting, setField, submit, reset } = useAddCandidate(handleSuccess);
+  const {
+    form,
+    errors,
+    submitting,
+    setField,
+    setForm,
+    submit,
+    reset,
+  } = useAddCandidate(handleSuccess);
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 
@@ -332,16 +340,31 @@ export function AddCandidateModal({ isOpen, onClose, onSuccess }: AddCandidateMo
 
           {/* Resume File Name — full width, optional */}
           <div style={fieldGroupStyle}>
-            <label htmlFor="ac-resumeFileName" style={labelStyle}>Resume File Name</label>
+            <label htmlFor="ac-resume" style={labelStyle}>
+              Resume
+            </label>
+
             <input
-              id="ac-resumeFileName"
-              type="text"
-              placeholder="e.g. jane_resume.pdf"
-              value={form.resume_file_name}
-              onChange={e => setField('resume_file_name', e.target.value)}
+              id="ac-resume"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+
+                if (file) {
+                  setForm(prev => ({
+                    ...prev,
+                    resume: file,
+                    resume_file_name: file.name,
+                  }));
+                }
+              }}
               style={inputStyle(false)}
             />
-            <span style={hintSpanStyle}>Optional — e.g. jane_resume.pdf</span>
+
+            <span style={hintSpanStyle}>
+              Upload PDF, DOC or DOCX (Max 5 MB)
+            </span>
           </div>
 
           {/* ── Actions ── */}

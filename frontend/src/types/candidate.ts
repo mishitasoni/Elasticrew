@@ -47,6 +47,7 @@ export interface CandidateCreate {
   job_role: string;
   skills: string;
   resume_file_name: string;
+  resume?: File | null;
 }
 
 export interface CandidateListResponse {
