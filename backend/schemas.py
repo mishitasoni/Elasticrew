@@ -45,3 +45,15 @@ class CandidateResponse(BaseModel):
 
     class Config:
         from_attributes = True
+class StatusUpdateRequest(BaseModel):
+    status: str
+
+
+class NotesUpdateRequest(BaseModel):
+    notes: str
+
+
+class AddReviewRequest(BaseModel):
+    type: str
+    reviewer: str
+    comment: str

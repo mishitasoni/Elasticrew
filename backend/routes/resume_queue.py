@@ -10,19 +10,29 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 
-import db
+from sqlalchemy.orm import Session
+from fastapi import Depends
+
+from database import get_db
+from models import Candidate, Review
+from schemas import (
+    StatusUpdateRequest,
+    NotesUpdateRequest,
+    AddReviewRequest
+)
+
 from anonymizer import anonymize_resume, anonymize_batch
-from models import StatusUpdateRequest, NotesUpdateRequest, AddReviewRequest
 
 router = APIRouter(prefix="/api/resume-queue", tags=["Resume Queue"])
 
 # ── Pending statuses (not yet submitted / incomplete) ─────────────────────────
-_PENDING = frozenset({
-    db.ResumeStatus.UPLOAD_PENDING,
-    db.ResumeStatus.REQUEST_SENT,
-    db.ResumeStatus.UPLOAD_OVERDUE,
-    db.ResumeStatus.INCOMPLETE,
-})
+
+_PENDING = {
+    "Upload Pending",
+    "Request Sent",
+    "Upload Overdue",
+    "Incomplete"
+}
 
 
 def _not_found(candidate_id: str) -> HTTPException:
@@ -34,20 +44,49 @@ def _bad_request(msg: str) -> HTTPException:
 
 
 # ── GET /api/resume-queue ─────────────────────────────────────────────────────
-@router.get(
-    "",
-    summary="Full resume queue",
-    description="Returns all candidates split into pending and review queues, plus KPI stats. All records are anonymized.",
-)
-def get_resume_queue():
-    all_c = db.query(Candidate).all()
-    pending = [c for c in all_c if c["resume_status"] in _PENDING]
-    review  = [c for c in all_c if c["resume_status"] not in _PENDING]
+@router.get("")
+def get_resume_queue(
+    db: Session = Depends(get_db)
+):
+    candidates = db.query(Candidate).all()
+
+    all_candidates = []
+
+    for c in candidates:
+        all_candidates.append({
+            "id": c.id,
+            "name": c.name,
+            "email": c.email,
+            "phone": c.phone,
+            "department": c.department,
+            "sub_department": c.sub_department,
+            "experience": c.experience,
+            "job_role": c.job_role,
+            "skills": c.skills,
+            "resume_status": c.resume_status,
+            "status": c.status,
+            "anonymous_resume": c.anonymous_resume,
+            "parsed_resume": c.parsed_resume,
+        })
+
+    pending = [
+        c for c in all_candidates
+        if c["resume_status"] in _PENDING
+    ]
+
+    review = [
+        c for c in all_candidates
+        if c["resume_status"] not in _PENDING
+    ]
+
     return {
         "success": True,
-        "stats":        db.get_queue_stats(),
         "pending_queue": anonymize_batch(pending),
-        "review_queue":  anonymize_batch(review),
+        "review_queue": anonymize_batch(review),
+        "stats": {
+            "pending": len(pending),
+            "review": len(review)
+        }
     }
 
 

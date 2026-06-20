@@ -34,6 +34,27 @@ class Candidate(Base):
     job_role = Column(String, nullable=True)
 
     skills = Column(String, nullable=True)
+    resume_status = Column(String, default="Awaiting Review")
+
+    hr_notes = Column(String, nullable=True)
+
+    resume_request_date = Column(String, nullable=True)
+
+    resume_submitted_on = Column(String, nullable=True)
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    candidate_id = Column(Integer)
+
+    review_type = Column(String)
+
+    reviewer = Column(String)
+
+    comment = Column(String)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     
 

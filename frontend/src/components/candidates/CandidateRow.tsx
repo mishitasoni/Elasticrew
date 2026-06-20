@@ -86,11 +86,42 @@ export function CandidateRow({ candidate }: CandidateRowProps) {
     setActionValue('');
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    // Status change endpoint not yet implemented in this sprint
-    const newClass = getStatusClass(e.target.value as CandidateStatus);
-    e.target.className = `grid-status-dropdown ${newClass}`;
-  };
+  const handleStatusChange = async (
+  e: React.ChangeEvent<HTMLSelectElement>
+) => {
+  const newStatus = e.target.value;
+
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:8000/candidates/${candidate.id}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update status");
+    }
+
+    const newClass = getStatusClass(
+      newStatus as CandidateStatus
+    );
+
+    e.target.className =
+      `grid-status-dropdown ${newClass}`;
+
+    alert("Status updated successfully");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to update status");
+  }
+};
 
   return (
     <tr className="candidate-row">

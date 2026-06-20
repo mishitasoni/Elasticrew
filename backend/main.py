@@ -8,6 +8,8 @@ from models import Base
 
 from routes.candidates import router as candidate_router
 from routes.resume import router as resume_router
+from routes.resume_queue import router as resume_queue_router
+from routes.resume_view import router as resume_view_router
 
 
 # Create database tables
@@ -29,6 +31,9 @@ app.add_middleware(
 # Routers
 app.include_router(candidate_router)
 app.include_router(resume_router)
+
+app.include_router(resume_queue_router)
+app.include_router(resume_view_router)
 
 # Serve static files (HTML, CSS, JS)
 app.mount("/static", StaticFiles(directory="../"), name="static")

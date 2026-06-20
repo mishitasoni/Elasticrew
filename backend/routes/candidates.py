@@ -1,5 +1,6 @@
 from utils.resume_parser import extract_text_from_pdf
 from utils.anonymiser import anonymize_resume
+from pydantic import BaseModel
 
 from fastapi import (
     APIRouter,
@@ -79,9 +80,50 @@ def create_candidate(
 }
 
 
+from fastapi import Query
+
 @router.get("/")
-def get_candidates(db: Session = Depends(get_db)):
-    candidates = db.query(Candidate).all()
+def get_candidates(
+    search: str | None = Query(None),
+    department: str | None = Query(None),
+    sub_department: str | None = Query(None),
+    stage: str | None = Query(None),
+    status: str | None = Query(None),
+    db: Session = Depends(get_db)
+):
+    query = db.query(Candidate)
+
+    # Search by candidate name
+    if search:
+        query = query.filter(
+            Candidate.name.ilike(f"%{search}%")
+        )
+
+    # Department filter
+    if department and department.lower() != "all":
+        query = query.filter(
+            Candidate.department == department
+        )
+
+    # Sub Department filter
+    if sub_department and sub_department.lower() != "all":
+        query = query.filter(
+            Candidate.sub_department == sub_department
+        )
+
+    # Stage filter
+    if stage and stage.lower() != "all":
+        query = query.filter(
+            Candidate.pipeline_stage == stage
+        )
+
+    # Status filter
+    if status and status.lower() != "all":
+        query = query.filter(
+            Candidate.status == status
+        )
+
+    candidates = query.all()
 
     result = []
 
@@ -188,4 +230,36 @@ async def create_candidate_with_resume(
         "candidate_id": candidate.id,
         "resume_filename": resume.filename,
         "resume_filepath": filepath
+    }
+
+class StatusUpdate(BaseModel):
+    status: str
+
+
+@router.patch("/{candidate_id}/status")
+def update_candidate_status(
+    candidate_id: int,
+    payload: StatusUpdate,
+    db: Session = Depends(get_db)
+):
+    candidate = (
+        db.query(Candidate)
+        .filter(Candidate.id == candidate_id)
+        .first()
+    )
+
+    if not candidate:
+        raise HTTPException(
+            status_code=404,
+            detail="Candidate not found"
+        )
+
+    candidate.status = payload.status
+
+    db.commit()
+    db.refresh(candidate)
+
+    return {
+        "message": "Status updated successfully",
+        "status": candidate.status
     }
